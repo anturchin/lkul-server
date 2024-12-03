@@ -1,0 +1,3844 @@
+swagger: '2.0'
+info:
+  title: gas
+  version: 1.0.0
+host: 'vvdev.ru:1334'
+schemes:
+  - http
+basePath: /api
+produces:
+  - application/json
+paths:
+  /regions:
+    get:
+        tags:
+        - Region
+        responses:
+          200:
+            description: ok
+            schema:
+              type: array
+              items:
+                $ref: '#/definitions/Region'
+    post:
+      tags:
+      - Region
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          $ref: '#/definitions/Region'
+      responses:
+        200:
+          description: ok
+          schema:
+            $ref: '#/definitions/Region'
+  /regions/{id}:
+    get:
+        tags:
+        - Region
+        parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+        responses:
+          200:
+            description: ok
+            schema:
+              $ref: '#/definitions/Region'
+    put:
+      tags:
+      - Region
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      - in: body
+        name: body
+        schema:
+          type: object
+          $ref: '#/definitions/Region'
+      responses:
+        200:
+          description: ok
+          schema:
+            $ref: '#/definitions/Region'
+  /regions/{id}/logo:
+    post:
+      tags:
+      - Region
+      consumes: 
+        - multipart/form-data
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      - in: formData
+        name: file
+        required: true
+        type: file
+      responses:
+        200:
+          description: Название файла 
+          schema:
+            type: object
+            properties:
+              file:
+                type: string
+        500:
+          description: Ошибка сервера
+  /tickets:
+    post:
+      tags:
+      - Ticket
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            email:
+              type: string
+            summary:
+              type: string
+            description:
+              type: string
+            cons_inn:
+              type: string
+            cons_kpp:
+              type: string
+            cons_name:
+              type: string
+            params:
+              type: string
+              description: любой объект
+            attachments:
+              type: array
+              items:
+                type: string
+      responses:
+        200:
+          description: ok
+  /orders:
+    post:
+      tags:
+      - Order
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            amount:
+              type: number
+            description:
+              type: string
+            addParams:
+              type: object
+              properties:
+                string:
+                  type: string
+            approveUrl:
+              type: string
+            declineUrl:
+              type: string
+            cancelUrl:
+              type: string
+            email: 
+              type: string
+            contr_UID: 
+              type: string
+            cons_UID:
+              type: string
+      responses:
+        200:
+          description: ok
+    get:
+      tags:
+      - Order
+      responses:
+        200:
+          description: ok
+  /orders/{id}:
+    get:
+      tags:
+      - Order
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      responses:
+        200:
+          description: ok
+  /orders/{id}/status:
+    get:
+      tags:
+      - Order
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      responses:
+        200:
+          description: ok
+  /orders/order_schedules:
+    post:
+      tags:
+      - Order
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            amount:
+              type: number
+            description:
+              type: string
+            addParams:
+              type: object
+              properties:
+                string:
+                  type: string
+            approveUrl:
+              type: string
+            declineUrl:
+              type: string
+            cancelUrl:
+              type: string
+            startDate:
+              type: string
+            repeatPeriodHours:
+              type: number
+            email: 
+              type: string
+            contr_UID: 
+              type: string
+      responses:
+        200:
+          description: ok
+    get:
+      tags:
+      - Order
+      responses:
+        200:
+          description: ok
+  /orders/order_schedules/{id}:
+    put:
+      tags:
+      - Order
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            amount:
+              type: number
+            paymentPerson:
+              type: string
+            inn:
+              type: string
+            kpp:
+              type: string
+            addParams:
+              type: object
+              properties:
+                string:
+                  type: string
+            approveUrl:
+              type: string
+            declineUrl:
+              type: string
+            cancelUrl:
+              type: string
+            startDate:
+              type: string
+            repeatPeriodHours:
+              type: number
+      responses:
+        200:
+          description: ok
+    get:
+      tags:
+      - Order
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        200:
+          description: ok
+    delete:
+      tags:
+      - Order
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        200:
+          description: ok
+  /super_admins/login:
+    post:
+      tags:
+      - SuperAdmin
+      summary: Вход
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            login:
+              type: string
+            password:
+              type: string
+      responses:
+        200:
+          description: Токен
+  /block_themes:
+    post:
+      tags:
+      - Block Theme
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            title:
+              type: string
+            text:
+              type: string
+            emails:
+              type: array
+              items:
+                type: string
+            onlyConfirmUsers:
+              type: boolean
+            phones:
+              type: array
+              items:
+                type: string
+      responses:
+        200:
+          description: ok
+    get:
+      tags:
+      - Block Theme
+      responses:
+        200:
+          description: ok
+  /block_themes/{id}:
+    get:
+      tags:
+      - Block Theme
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      responses:
+        200:
+          description: ok
+    put:
+      tags:
+      - Block Theme
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            onlyConfirmUsers:
+              type: boolean
+            title:
+              type: string
+            text:
+              type: string
+            emails:
+              type: array
+              items:
+                type: string
+            phones:
+              type: array
+              items:
+                type: string
+      responses:
+        200:
+          description: ok
+    delete:
+      tags:
+      - Block Theme
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      responses:
+        200:
+          description: ok
+  /news:
+    post:
+      tags:
+      - News
+      summary: Создать новость
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            title:
+              type: string
+            body:
+              type: string
+            content:
+              type: string
+      responses:
+        200:
+          description: ok
+    get:
+      tags:
+      - News
+      summary: список новостей
+      responses:
+        200:
+          description: ok
+  /news/{id}:
+    get:
+      tags:
+      - News
+      summary: новость по id
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      responses:
+        200:
+          description: ok
+    put:
+      tags:
+      - News
+      summary: обновить новость по id
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            title:
+              type: string
+            body:
+              type: string
+            content:
+              type: string
+      responses:
+        200:
+          description: ok
+    delete:
+      tags:
+      - News
+      summary: удалить новость по id
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      responses:
+        200:
+          description: ok
+  /admins/mrg_orgs:
+    put:
+      tags:
+      - MRG
+      summary: Обновить инфу о организации
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            inn:
+              type: string
+            kpp:
+              type: string
+      responses:
+        200:
+          description: ok
+    get:
+      tags:
+      - MRG
+      summary: Получить инфу о организации
+      responses:
+        200:
+          description: ok
+  /admins/consumers/notifications:
+    post:
+      tags:
+      - Consumer notification
+      summary: Создать уведомление
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            type:
+              type: string
+            text:
+              type: string
+            cons_UIDs:
+              type: array
+              items:
+                type: string
+            userIds:
+              type: array
+              items:
+                type: string
+            allConsumers:
+              type: boolean
+      responses:
+        200:
+          description: ok
+    get:
+      tags:
+      - Consumer notification
+      summary: Список уведомлений для админа
+      parameters:
+      - in: query
+        name: limit
+        type: string
+      - in: query
+        name: page
+        type: string
+      responses:
+        200:
+          description: ok  
+  /admins/consumers/notifications_by_user/all/viewing:
+    get:
+      tags:
+      - Consumer notification
+      summary: Пометить все уведомления прочитанными
+      responses:
+        200:
+          description: ok  
+  /admins/consumers/notifications/{id}:
+    get:
+      tags:
+      - Consumer notification
+      summary: уведомление по id для админа
+      parameters:
+      - in: path
+        type: string
+        name: id
+        required: true
+      responses:
+        200:
+          description: ok 
+    delete:
+      tags:
+      - Consumer notification
+      summary: удалить уведомление по id для админа
+      parameters:
+      - in: path
+        type: string
+        name: id
+        required: true
+      responses:
+        200:
+          description: ok 
+  /admins/consumers/notifications_by_user:
+    get:
+      tags:
+      - Consumer notification
+      summary: Список уведомлений для пользователя
+      parameters:
+      - in: query
+        name: new_n
+        type: boolean
+      responses:
+        200:
+          description: ok 
+  /admins/consumers/notifications_by_user/{id}:
+    get:
+      tags:
+      - Consumer notification
+      summary: уведомление по id для пользователя
+      parameters:
+      - in: path
+        type: string
+        name: id
+        required: true
+      responses:
+        200:
+          description: ok  
+  /files/templates:
+    post:
+      tags:
+      - Template
+      summary: Создать шаблон
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            type:
+              type: string
+            text:
+              type: string
+      responses:
+        200:
+          description: ok
+    get:
+      tags:
+      - Template
+      summary: Список шаблонов
+      parameters:
+      - in: query
+        name: type
+        type: string
+      - in: query
+        name: text
+        type: string
+      responses:
+        200:
+          description: ok
+  /files/templates/{id}:
+    put:
+      tags:
+      - Template
+      summary: Обновить шаблон
+      parameters:
+      - in: path
+        type: string
+        required: true
+        name: id
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            type:
+              type: string
+            text:
+              type: string
+      responses:
+        200:
+          description: ok
+    delete:
+      tags:
+      - Template
+      summary: Удалить шаблон
+      parameters:
+      - in: path
+        type: string
+        required: true
+        name: id
+      responses:
+        200:
+          description: ok
+  /files/questions:
+    post:
+      tags:
+      - FAQ
+      summary: Создать вопрос-ответ
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            text:
+              type: string
+            category:
+              type: string
+            answer:
+              type: string
+      responses:
+        200:
+          description: ok
+    get:
+      tags:
+      - FAQ
+      summary: Получить список вопрос-ответ
+      responses:
+        200:
+          description: ok
+  /files/questions/{id}:
+    put:
+      tags:
+      - FAQ
+      summary: Обновить вопрос-ответ
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            text:
+              type: string
+            category:
+              type: string
+            answer:
+              type: string
+      responses:
+        200:
+          description: ok
+    get:
+      tags:
+      - FAQ
+      summary: Получить вопрос-ответ
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        200:
+          description: ok
+    delete:
+      tags:
+      - FAQ
+      summary: Удалить вопрос-ответ
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        200:
+          description: ok
+  /questions/categories/{category}:
+    delete:
+      tags:
+      - FAQ
+      summary: Удалить категорию
+      parameters:
+      - in: path
+        name: category
+        required: true
+        type: string
+      responses:
+        200:
+          description: ok
+  /super_admins/ssd_url:
+    post:
+      tags:
+      - SSD
+      summary: Создать адрес ссд
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            uri:
+              type: string
+            email:
+              type: string
+            title:
+              type: string
+      responses:
+        200:
+          description: Токен
+    get:
+      tags:
+      - SSD
+      summary: Список ссд
+      responses:
+        200:
+          description: Токен 
+  /super_admins/ssd_url/{id}:
+    put:
+      tags:
+      - SSD
+      summary: Обновить адрес ссд
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            uri:
+              type: string
+            email:
+              type: string
+            title:
+              type: string
+      responses:
+        200:
+          description: Токен
+    delete:
+      tags:
+      - SSD
+      summary: удалить адрес ссд
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      responses:
+        200:
+          description: Токен
+  /admins/login:
+    post:
+      tags:
+      - Admin
+      summary: Вход
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            login:
+              type: string
+            password:
+              type: string
+      responses:
+        200:
+          description: Токен
+  /admins/users:
+    get:
+      tags:
+      - Admin
+      summary: Список пользователей
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            email:
+              type: string
+            name:
+              type: string
+            page:
+              type: number
+            limit:
+              type: number
+      responses:
+        200:
+          description: ок
+  /admins/users/{id}:
+    get:
+      tags:
+      - Admin
+      summary: Пользователь по id
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      responses:
+        200:
+          description: ок 
+  /admins/users/consumers/{id}:
+    get:
+      tags:
+      - Admin
+      summary: Потребитель по id
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      responses:
+        200:
+          description: ок 
+  /admins/users/blocked:
+    put:
+      tags:
+      - Admin
+      summary: Пользователь по id
+      parameters:
+      - in: body
+        name: body
+        schema: 
+          type: object
+          properties:
+            blocked: 
+              type: boolean
+            userId:
+              type: string
+            consumerId:
+              type: string
+            subLoginId:
+              type: string
+      responses:
+        200:
+          description: ок 
+  /admins/users/sub_logins/{id}:
+    put:
+      tags:
+      - Admin
+      summary: Пользователь по id
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      - in: body
+        name: body
+        schema: 
+          type: object
+          properties:
+            essences:
+              type: object
+              properties:
+                consumers:
+                  type: array
+                  items:
+                    type: string
+                locations:
+                  type: array
+                  items:
+                    type: string
+                mets:
+                  type: array
+                  items:
+                    type: string
+            tabs:
+              $ref: '#/definitions/Tabs'
+            roleIds:
+              type: array
+              items:
+                type: string
+      responses:
+        200:
+          description: ок 
+  /curators/login:
+    post:
+      tags:
+      - Curator
+      summary: Вход
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            login:
+              type: string
+            password:
+              type: string
+      responses:
+        200:
+          description: Токен
+  /curators/users:
+    post:
+      tags:
+      - Curator
+      summary: создать пользователя
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            firstName:
+              type: string
+            lastName: 
+              type: string
+            middleName:
+              type: string
+            password:
+              type: string
+            repeatPassword:
+              type: string
+            email:
+              type: string
+            position:
+              type: string
+            cons_inn:
+              type: string
+            cons_kpp:
+              type: string
+      responses:
+        200:
+          description: ok
+  /curators/notifications:
+    post:
+      tags:
+      - Curator
+      summary: рассылка 
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            userIds:
+              type: array
+              items:
+                type: string
+            cons_UIDs: 
+              type: array
+              items:
+                type: string
+            type:
+              type: string
+            text:
+              type: string
+            allUsers:
+              type: boolean
+            allConsumers:
+              type: boolean
+      responses:
+        200:
+          description: ok
+  /curators/consumers:
+    get:
+      tags:
+      - Curator
+      summary: Список cons_UID для куратора
+      parameters:
+      - in: query
+        name: email
+        type: string
+        description: Почту прокидывает админ если хочет получить список консамеров куратора
+      - in: query
+        name: cons_inn
+        type: string
+      - in: query
+        name: cons_short_name
+        type: string
+      - in: query
+        name: user_name
+        type: string
+      - in: query
+        name: sortBy
+        type: string
+      - in: query
+        name: desc
+        type: boolean
+      - in: query
+        name: cons_UIDs
+        type: string
+        description: array
+      - in: query
+        name: lkp
+        type: string
+      - in: query
+        name: cons_kpp
+        type: string
+      responses:
+        200:
+          description: ок
+  /curators/info:
+    get:
+      tags:
+      - Curator
+      summary: Инфа по куратору
+      responses:
+        200:
+          description: ок
+  /curators/many:
+    put:
+      tags:
+      - Curator
+      summary: Обновить список кураторов
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            ids:
+              type: string
+            blocked:
+              type: boolean
+            tabs:
+              type: string
+      responses:
+        200:
+          description: ок
+    delete:
+      tags:
+      - Curator
+      summary: Удалить список кураторов
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            ids:
+              type: string
+      responses:
+        200:
+          description: ок
+  /curators:
+    get:
+      tags:
+      - Curator
+      summary: Список кураторов для админа лк
+      parameters:
+      - in: query
+        name: position
+        type: string
+      - in: query
+        name: sort
+        type: string
+      - in: query
+        name: name
+        type: string
+      - in: query
+        name: email
+        type: string
+      responses:
+        200:
+          description: ок
+    post:
+      tags:
+      - Curator
+      summary: Создать куратора 
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            login:
+              type: string
+            password:
+              type: string
+            repeatPassword:
+              type: string
+            email:
+              type: string
+            phone:
+              type: string
+            position:
+              type: string
+            blocked:
+              type: boolean
+            firstName:
+              type: string
+            lastName:
+              type: string
+            middleName:
+              type: string
+      responses:
+        200:
+          description: ок
+  /curators/{id}:
+    get:
+      tags:
+      - Curator
+      summary: Получить куратора 
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        200:
+          description: ок
+    delete:
+      tags:
+      - Curator
+      summary: удалить куратора 
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        200:
+          description: ок
+    put:
+      tags:
+      - Curator
+      summary: Обновить куратора 
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            login:
+              type: string
+            password:
+              type: string
+            repeatPassword:
+              type: string
+            email:
+              type: string
+            phone:
+              type: string
+            position:
+              type: string
+            blocked:
+              type: boolean
+      responses:
+        200:
+          description: ок
+  /users/register:
+    post:
+      tags:
+      - User
+      summary: Регистрация пользователей
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            email:  
+              type: string
+            password:
+              type: string
+            repeatPassword:
+              type: string
+            cons_inn:
+              type: string
+            cons_kpp:
+              type: string
+            firstName:
+              type: string
+            lastName:
+              type: string
+            middleName:
+              type: string
+      responses:
+        200:
+          description: Ссылка на вход отправляется на почту
+          schema:
+            type: object
+            properties:
+              code:
+                type: string
+                description: В тестовом режиме 
+              codeId:
+                type: string
+        422:
+          description: Пароль отсутствует/не совпадают
+        429:
+          description: timeout 1 min
+        500:
+          description: Ошибка сервера
+  /users/confirm:
+    post:
+      tags:
+      - User
+      summary: Подтверждение почты
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            codeId:
+              type: string
+            code:
+              type: string
+      responses:
+        200:
+          description: Токен
+          schema:
+            $ref: '#/definitions/token'
+        401:
+          description: Код неправильный
+        500:
+          description: Ошибка сервера
+  /users/login:
+    post:
+      tags:
+      - User
+      summary: Вход
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            login:
+              type: string
+            password:
+              type: string
+      responses:
+        200:
+          description: Токен
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+              _id:
+                type: string
+                description: id пользователя
+              consumers:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      login:
+                        type: string
+                      cons_UID:
+                        type: string
+              cons_UIDs:
+                type: array
+                items:
+                  type: string
+        401:
+          description: Пароль неправильный
+        500:
+          description: Ошибка сервера
+  /users/{id}:
+    delete:
+      tags:
+      - User
+      summary: удалить пользователя(будут удалены все консамеры и сублогины относящиеся к пользователю)
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      responses:
+        200:
+          description: ok
+  /users/sub_logins:
+    post:
+      tags:
+      - User
+      summary: Создать нового пользователя(доступен только админам)
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            login:
+              type: string
+            password:
+              type: string
+            repeatPassword:
+              type: string
+            firstName:
+              type: string
+            lastName:
+              type: string
+            middleName:
+              type: string
+            tabs:
+              $ref: '#/definitions/Tabs'
+            roleIds:
+              type: array
+              items:
+                type: string
+            front_uri:  
+              type: string
+            consumers:
+              type: array
+              items:
+                type: string
+            contracts:
+              type: array
+              items:
+                type: string
+      responses:
+        200:
+          description: Создать менеджера
+          schema:
+            $ref: '#/definitions/Role'
+        409:
+          description: email/login уже занят
+        500:
+          description: Ошибка сервера
+    get:
+      tags:
+      - User
+      summary: Список sub_logins 
+      responses:
+        200:
+          description: Список ролей
+  /users/link/{str}:
+    put:
+      tags:
+      - User
+      parameters:
+      - in: path
+        name: str
+        type: string
+        required: true
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            password:
+              type: string
+            repeatPassword:
+              type: string
+      responses:
+        200:
+          description: ok
+  /users/sub_logins/{id}:
+    get:
+      tags:
+      - User
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      responses:
+        200:
+          description: ok
+        500:
+          description: server error
+    put:
+      tags:
+      - User
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            roleIds:
+              type: array
+              items:
+                type: string
+            roleId:
+              type: string
+            essences:
+              type: object
+              properties:
+                consumers:
+                  type: array
+                  items:
+                    type: string
+                locations:
+                  type: array
+                  items:
+                    type: string
+                mets:
+                  type: array
+                  items:
+                    type: string
+            blocked:
+              type: boolean
+            firstName:
+              type: string
+            lastName:
+              type: string
+            middleName:
+              type: string
+            tabs:
+              $ref: '#/definitions/Tabs'
+            position:
+              type: string
+      responses:
+        200:
+          description: ok
+    delete: 
+      tags:
+      - User
+      summary: delete role
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      responses:
+        200:
+          description: ok
+        404:
+          description: not found
+        500:
+          description: server error
+  /users/sub_logins/{id}/role_types:
+    put:
+      tags:
+      - User
+      summary: Присвоить роли сублогину
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            roleTypes:
+              type: array
+              items:
+                type: string
+      responses:
+        200:
+          description: ok
+  /users/notices:
+    post:
+      tags:
+      - User
+      summary: Создать уведомление для сублогинов
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+            type: 
+              type: string
+      responses:
+        200:
+          description: ok
+    get:
+      tags:
+      - User
+      summary: Список уведомлений
+      parameters:
+      - in: query
+        name: all
+        type: string
+        description: без этого параметра приходят только те которые сублогин не доставал по id(то есть не смотрел)
+      responses:
+        200:
+          description: ok
+  /users/notices/{id}:
+    get:
+      tags:
+      - User
+      summary: Достать уведомление(отметить прочитанным)
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      responses:
+        200:
+          description: ok
+  /appeals/emails:
+    get:
+      tags:
+      - Appeal
+      summary: admin emails
+      responses:
+        200:
+          description: ok
+  /appeals:
+    get:
+      tags:
+      - Appeal
+      summary: list
+      parameters:
+      - in: query
+        name: search
+        type: string
+      - in: query
+        name: limit
+        type: string
+      - in: query
+        name: page
+        type: string
+      - in: query
+        name: type
+        type: string
+      - in: query
+        name: direction
+        type: string
+      - in: query
+        name: state
+        type: string
+      - in: query
+        name: draft
+        type: boolean 
+      - in: query
+        name: deleted
+        type: boolean 
+      responses:
+        200:
+          description: ok
+  /appeals/by_user:
+    post:
+      tags:
+      - Appeal
+      summary: create
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            adminEmail:
+              type: string
+            tp:
+              type: boolean
+              description: Для обращений в тп
+            subLoginEmail:
+              type: string 
+            subLoginName: 
+              type: string 
+            subLoginPhone:
+              type: string 
+            subLoginPosition:
+              type: string
+            cons_inn:
+              type: string 
+            cons_kpp: 
+              type: string 
+            cons_name:
+              type: string
+            fileNames:
+              type: array
+              items:
+                type: string
+            description: 
+              type: string
+            title:
+              type: string
+            contr_UID:
+              type: string
+            draft:
+              type: boolean
+            appealId:
+              type: string
+            type:
+              type: string
+            appealCuratorName:
+              type: string
+            ssd_send:
+              type: boolean
+      responses:
+        200:
+          description: ok
+  /appeals/by_curator:
+    post:
+      tags:
+      - Appeal
+      summary: create
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            fileNames:
+              type: array
+              items:
+                type: string
+            description: 
+              type: string
+            title:
+              type: string
+            userId:
+              type: string
+            draft:
+              type: boolean
+            appealId:
+              type: string
+            type:
+              type: string
+      responses:
+        200:
+          description: ok
+  /appeals/{id}/draft:
+    delete:
+      tags:
+      - Appeal
+      summary: Удалить
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      responses:
+        200:
+          description: ok
+  /appeals/{id}:
+    get:
+      tags:
+      - Appeal
+      summary: get by id
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      responses:
+        200:
+          description: ok
+  /notification:
+    get:
+      tags:
+      - Notification
+      summary: Параметры уведомлений
+      parameters:
+      - in: query
+        name: cons_UID
+        type: string
+      responses:
+        200:
+          description: ok
+    put:
+      tags:
+      - Notification
+      summary: Параметры уведомлений
+      parameters:
+      - in: query
+        name: cons_UID
+        type: string
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            emails:
+              type: array
+              items:
+                type: string
+            phones:
+              type: array
+              items:
+                type: string
+            sendEmail:
+              type: boolean
+            sendPhone:
+              type: boolean
+      responses:
+        200:
+          description: ok
+  /locations:
+    get:
+      tags:
+      - Locations
+      summary: Список площадок + список mets для каждой площадки + список equipments для каждого mets (доступные каждому юзеру)
+      parameters:
+      - in: query
+        name: contr_UID
+        type: string
+      - in: query
+        name: work
+        type: boolean
+      - in: query
+        name: equipment_type
+        type: string
+      responses:
+        200:
+          description: Список площадок
+          schema:
+            $ref: '#/definitions/Location'
+        500:
+          description: Ошибка сервера
+  /mets/blocking:
+    put:
+      tags:
+      - Met
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            datesForMonth:
+              type: array
+              items:
+                type: object
+                properties:
+                  month:
+                    type: number
+                  year:
+                    type: number
+                  date:
+                    type: string
+                    description: ISO
+      responses:
+        200:
+          description: ok
+    get:
+      tags:
+      - Met
+      parameters:
+      - in: query
+        name: year
+        type: string
+        required: false
+      responses:
+        200:
+          description: ok
+  /locations/{id}/mets:
+    get:
+      tags:
+      - Locations
+      parameters:
+      - in: query
+        name: work
+        type: boolean
+      - in: query
+        name: equipment_type
+        type: string
+      - in: path
+        name: id
+        type: string
+        required: true
+      - in: query
+        name: st_date
+        type: string
+      - in: query
+        name: end_date
+        type: string
+      responses:
+        200:
+          description: ok
+  /equipments/{id}:
+    put:
+      summary: Ввод показаний
+      tags:
+      - Equipments
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            location_uuid:
+              type: string
+            Met_uuid: 
+              type: string
+            Dt_value:
+              type: string
+            Value:
+              type: number
+            values:
+              type: array
+              items:
+                type: object
+                properties:
+                  Dt_value:
+                    type: string
+                    description: Дата(день)
+                  Value:
+                    type: number
+            valueType:
+              type: number
+              description: 1-ввод показаний 2-ввод обьемов
+            contr_UID:
+              type: string
+            GasVolume:
+              type: number
+      responses:
+        200:
+          description: OK
+  /equipments/import/{fileName}:
+    post:
+      tags:
+      - Equipments
+      summary: Entering values from excel file
+      parameters:
+      - in: path
+        name: fileName
+        required: true
+        type: string
+        description: only .xlsx/.csv files
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            valueType:
+              type: number
+            equipment_uuid:
+              type: string  
+      responses:
+        200:
+          description: ok
+        400:
+          description: Enter all values
+        500:
+          description: server error
+  /equipments/confirm:
+    put:
+      tags:
+      - Equipments
+      summary: Отправить файл подтверждающий показания
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            fileName:
+              type: string
+            location_uuid:
+              type: string
+            Met_uuid:
+              type: string
+      responses:
+        200:
+          description: ok
+        500:
+          description: server error
+  /equipments/export:
+    get:
+      tags:
+      - Equipments
+      summary: export data in xlsx file
+      parameters:
+      - in: query
+        name: contr_UID
+        type: string
+      - in: query
+        name: location_uuid
+        type: string
+      - in: query
+        name: Met_uid
+        type: string
+      - in: query
+        name: valueType
+        type: number
+      responses:
+        200:
+          description: file name
+          schema:
+            type: object
+            properties:
+              fileName:
+                type: string
+  /equipments/{id}/values:
+    get:
+      tags:
+      - Equipments
+      summary: Получить показания
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        200:
+          description: OK
+  /equipments/gas_equipment_info:
+    get:
+      tags:
+      - Equipments
+      parameters:
+      - in: query
+        name: work
+        type: boolean
+      - in: query
+        name: equipment_type
+        type: string
+      - in: query
+        name: location_uuids
+        type: array
+        items:
+          type: string
+      responses:
+        200:
+          description: OK
+        404:
+          description: resource not found
+        500:
+          description: server error
+  /equipments/qGetScanEquipmentValues:
+    get:
+      tags:
+      - Equipments
+      parameters:
+      - in: query
+        name: file_id
+        type: string
+      responses:
+        200:
+          description: OK
+  /equipments/qDelScanEquipmentValues:
+    delete:
+      tags:
+      - Equipments
+      parameters:
+      - in: query
+        name: file_id
+        type: string
+      responses:
+        200:
+          description: OK
+  /equipments/qSetScanEquipmentValues:
+    put:
+      tags:
+      - Equipments
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            location_uuid:
+              type: string
+            met_uuid:
+              type: string
+            dt_value:
+              type: string
+            name:
+              type: string
+            fileName:
+              type: string
+            equipment_uuid:
+              type: string
+      responses:
+        200:
+          description: OK
+  /users/roles:
+    get:
+      tags:
+      - User
+      summary: get list
+      responses:
+        200:
+          description: OK
+    post:
+      tags:
+      - User
+      summary: create role settings
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            type:
+              type: string
+            tabs:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  read: 
+                    type: boolean
+                  write:
+                    type: boolean
+      responses:
+        200:
+          description: ok
+  /users/roles/{id}:
+    get:
+      tags:
+      - User
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      responses:
+        200:
+          description: ok
+    put:
+      tags:
+      - User
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            tabs:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  read: 
+                    type: boolean
+                  write:
+                    type: boolean
+      responses:
+        200:
+          description: ok
+    delete:
+      tags:
+      - User
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      responses:
+        200:
+          description: ok
+  /users/reset_password:
+    put:
+      tags:
+      - User
+      summary: Сбросить пароль
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            login:  
+              type: string
+      responses:
+        200:
+          description: Код отправлен на почту
+          schema:
+            type: object
+            properties:
+              link:
+                type: string
+        500:
+          description: Ошибка сервера
+  /users/reset_password/confirm:
+    put:
+      tags:
+      - User
+      summary: Подтверждение после сброса
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            password:
+              type: string
+            repeatPassword:
+              type: string
+            codeId:
+              type: string
+            code: 
+              type: string
+      responses:
+        200:
+          description: ok
+  /users/register_new:
+    post:
+      tags:
+      - User
+      summary: регистрация пользователя без обращения в 1С и без инн и кпп
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            password:
+              type: string
+            repeatPassword:
+              type: string
+            email:
+              type: string
+      responses:
+        200:
+          description: ok
+  /users/register_new_confirm:
+    post:
+      tags:
+      - User
+      summary: регистрация пользователя без обращения в 1С и без инн и кпп - подтверждение
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            codeId:
+              type: string
+            code:
+              type: string
+      responses:
+        200:
+          description: ok
+  /users/check_code:
+    put:
+      tags:
+      - User
+      summary: Проверить код
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            codeId:
+              type: string
+            code: 
+              type: string
+      responses:
+        200:
+          description: ok
+  /users/change_password:
+    put:
+      tags:
+      - User
+      summary: Изменить пароль
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            password:
+              type: string
+            repeatPassword:
+              type: string
+            subLoginId:
+              type: string
+      responses:
+        200:
+          description: Пароль изменен
+        500:
+          description: Ошибка сервера
+  /users/login_sbis:
+    post:
+      tags:
+      - User
+      summary: Логин/пароль для СБИС
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            login:
+              type: string
+            password:
+              type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              session:
+                type: string
+        500:
+          description: Ошибка сервера
+  /users/sert_list:
+    post:
+      tags:
+      - User
+      summary: Проверить список сертификатов
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            sertList:
+              type: array
+              items:
+                type: object
+                properties:
+                  "Отпечаток": 
+                    type: string
+                  "ДвоичныеДанные":
+                    type: string
+      responses:
+        200:
+          description: OK
+        500:
+          description: Ошибка сервера
+  /users/auth_by_sert:
+    post:
+      tags:
+      - User
+      summary: Авторизация сертификатом
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            sert:
+              type: object
+              properties:
+                "ДвоичныеДанные":
+                  type: string
+      responses:
+        200:
+          description: OK
+        500:
+          description: Ошибка сервера
+  /users/consumers:
+    post:
+      tags:
+      - User
+      summary: Добавить консамера
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            email:
+              type: string
+            cons_inn:
+              type: string
+            cons_kpp:
+              type: string
+      responses:
+        200:
+          description: OK
+        500:
+          description: Ошибка сервера
+  /users/consumers/{id}:
+    put:
+      tags:
+      - User
+      summary: Изменить консамера
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+      responses:
+        200:
+          description: OK
+  /users/consumers/confirm:
+    post:
+      tags:
+      - User
+      summary: Добавить консамера
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            code:
+              type: string
+            codeId:
+              type: string
+      responses:
+        200:
+          description: OK
+        500:
+          description: Ошибка сервера
+  /contracts/by_location/{location_uuid}:
+    get:
+      tags:
+      - Contract
+      parameters:
+      - in: path
+        name: location_uuid
+        type: string
+        required: true
+      responses:
+        200:
+          description: OK
+  /contracts/mets_volumes:
+    post:
+      tags:
+      - Contract
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            date:
+              type: string
+            contr_UID:
+              type: string
+            planVolume:
+              type: number
+            factVolume:
+              type: number
+      responses:
+        200:
+          description: OK
+    get:
+      tags:
+      - Contract
+      parameters:
+      - in: query
+        name: location_UID
+        type: string
+      responses:
+        200:
+          description: OK
+  /contracts/mets_volumes/{id}:
+    put:
+      tags:
+      - Contract
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            date:
+              type: string
+            planVolume:
+              type: number
+            factVolume:
+              type: number
+            contr_UID:
+              type: string
+      responses:
+        200:
+          description: OK
+    delete:
+      tags:
+      - Contract
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      responses:
+        200:
+          description: OK
+  /users/requests:
+    post:
+      tags:
+      - Request
+      summary: Создать заявку на регу/авторизацию
+      parameters:
+      - in: body
+        name: body
+        schema:
+          $ref: '#/definitions/request'
+      responses:
+        200:
+          description: Заявка отправлена
+        500:
+          description: Ошибка сервера
+    get:
+      tags:
+      - Request
+      summary: Список(для теста, в рабочей версии такого метода не будет)
+      responses:
+        200:
+          description: Заявка отправлена
+          schema:
+            $ref: '#/definitions/request'
+        500:
+          description: Ошибка сервера
+  /contracts:
+    get:
+      tags:
+      - Contract
+      summary: Список договоров клиента
+      responses:
+        200:
+          description: Список договоров
+          schema:
+            type: object
+            properties:
+              pagination:
+                $ref: '#/definitions/Pagination'
+              contracts:
+                type: array
+                items:
+                  $ref: '#/definitions/ContractList'
+        500:
+          description: Ошибка сервера
+  /contracts/{id}:
+    get:
+      tags:
+      - Contract
+      summary: Инфа по договору
+      parameters:
+      - in: path
+        type: string
+        name: id
+        required: true
+      responses:
+        200:
+          description: Инфа по договору
+          schema:
+            $ref: '#/definitions/Contract'
+        500:
+          description: Ошибка сервера
+  /contracts/fact:
+    get:
+      tags:
+      - Contract
+      parameters:
+      - in: query
+        name: contr_UIDs
+        type: array
+        items:
+          type: string
+        required: true
+      responses:
+        200:
+          description: Получение данных о состоянии взаиморасчетов по договору за период
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ContractFactSum'
+        500:
+          description: Ошибка сервера
+  /contracts/settlement:
+    get:
+      tags:
+      - Contract
+      summary: Взаиморасчеты
+      parameters:
+      - in: query
+        name: st_date
+        type: string
+      - in: query
+        name: end_date
+        type: string
+      responses:
+        200:
+          description: OK
+        500:
+          description: server error
+  /contracts/payments:
+    get:
+      tags:
+      - Contract
+      parameters:
+      - in: query
+        name: contr_UIDs
+        type: array
+        items:
+          type: string
+        required: true
+      responses:
+        200:
+          description: Получение данных о состоянии взаиморасчетов по договору за период
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ContractPayment'
+        500:
+          description: Ошибка сервера
+  /contracts/balance:
+    get:
+      tags:
+      - Contract
+      parameters:
+      - in: query
+        name: contr_UIDs
+        type: array
+        items:
+          type: string
+        required: true
+      - in: query
+        name: st_date
+        type: string
+      - in: query
+        name: end_date
+        type: string
+      responses:
+        200:
+          description: Получение данных о состоянии взаиморасчетов по договору за период
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ContractBalance'
+        500:
+          description: Ошибка сервера
+  /contracts/{id}/qReportGasConsumption:
+    get:
+      tags:
+      - Contract
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      - in: query
+        name: location_UID
+        type: string
+        required: true
+      - in: query
+        name: st_date1
+        type: string
+      - in: query
+        name: end_date1
+        type: string
+      - in: query
+        name: st_date2
+        type: string
+      - in: query
+        name: end_date2
+        type: string
+      - in: query
+        name: data_group
+        type: string
+      responses:
+        200:
+          description: ok
+  /contracts/{id}/qReportPaymentVolume:
+    get:
+      tags:
+      - Contract
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      - in: query
+        name: cons_point_uid
+        type: string
+      - in: query
+        name: st_date1
+        type: string
+      - in: query
+        name: end_date1
+        type: string
+      - in: query
+        name: st_date2
+        type: string
+      - in: query
+        name: end_date2
+        type: string
+      - in: query
+        name: data_group
+        type: string
+      responses:
+        200:
+          description: ok
+  /contracts/{id}/qReportPlanFactGasConsumption:
+    get:
+      tags:
+      - Contract
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      - in: query
+        name: cons_point_uid
+        type: string
+        required: true
+      - in: query
+        name: st_date
+        type: string
+      - in: query
+        name: end_date
+        type: string
+      - in: query
+        name: data_group
+        type: string
+      responses:
+        200:
+          description: ok
+  /contracts/{id}/qPromContractDocInfo:
+    get:
+      tags:
+      - Contract
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      - in: query
+        name: st_date
+        type: string
+      - in: query
+        name: end_date
+        type: string
+      responses:
+        200:
+          description: ok
+  /contracts/qPromContractDocInfo/{doc_UID}:
+    get:
+      tags:
+      - Contract
+      parameters:
+      - in: path
+        name: doc_UID
+        required: true
+        type: string
+      - in: query
+        name: doc_type
+        type: string
+        required: true
+      responses:
+        200:
+          description: ok
+  /contracts/{id}/qReportFactGasPrice:
+    get:
+      tags:
+      - Contract
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      - in: query
+        name: cons_point_uid
+        type: string
+      - in: query
+        name: st_date1
+        type: string
+      - in: query
+        name: end_date1
+        type: string
+      - in: query
+        name: st_date2
+        type: string
+      - in: query
+        name: end_date2
+        type: string
+      - in: query
+        name: data_group
+        type: string
+      responses:
+        200:
+          description: ok
+  /contracts/{id}/qReportGasSumComparison:
+    get:
+      tags:
+      - Contract
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      - in: query
+        name: st_date
+        type: string
+      - in: query
+        name: end_date
+        type: string
+      - in: query
+        name: data_group
+        type: string
+      responses:
+        200:
+          description: ok
+  /contracts/{id}/qReportGasPaymentStructure:
+    get:
+      tags:
+      - Contract
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      - in: query
+        name: data_group
+        type: string
+      - in: query
+        name: cons_point_uid
+        type: string
+      - in: query
+        name: st_date1
+        type: string
+      - in: query
+        name: end_date1
+        type: string
+      - in: query
+        name: st_date2
+        type: string
+      - in: query
+        name: end_date2
+        type: string
+      responses:
+        200:
+          description: ok
+  /contracts/{id}/qReportPlanFactGasPrice:
+    get:
+      tags:
+      - Contract
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      - in: query
+        name: cons_point_uid
+        type: string
+      - in: query
+        name: st_date
+        type: string
+      - in: query
+        name: end_date
+        type: string
+      responses:
+        200:
+          description: ok
+  /contracts/{id}/qPromContractPlanGasVolume:
+    get:
+      tags:
+      - Contract
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        200:
+          description: ok
+  /consumers:
+    get:
+      tags:
+      - Consumers
+      summary: Инфа по клиенту
+      responses:
+        200:
+          description: Info
+          schema:
+            $ref: '#/definitions/Consumer'
+  /consumers/payments:
+    get:
+      tags:
+      - Consumers
+      parameters:
+      - in: query
+        name: st_date
+        type: string
+      - in: query
+        name: end_date
+        type: string
+      responses:
+        200:
+          description: ok
+        500:
+          description: server error
+  /consumers/unknown_payments:
+    get:
+      tags:
+      - Consumers
+      parameters:
+      - in: query
+        name: st_date
+        type: string
+      - in: query
+        name: end_date
+        type: string
+      responses:
+        200:
+          description: ok
+        500:
+          description: server error
+  /public/{file_name}:
+    get:
+      tags:
+      - File
+      summary: получать все файлы по базавому url без использования api/ указать название файла с расширением после public/
+      parameters:
+      - in: path
+        name: file_name
+        required: true
+        type: string
+      responses:
+        200:
+          description: файл
+        404:
+          description: Не найден файл
+        500:
+          description: Ошибка сервера
+  /files:
+    post:
+      tags:
+      - File
+      consumes: 
+      - multipart/form-data
+      parameters:
+      - in: formData
+        name: file
+        required: true
+        type: file
+      responses:
+        200:
+          description: Название файла 
+          schema:
+            type: object
+            properties:
+              file:
+                type: string
+        500:
+          description: Ошибка сервера
+  /files/term_of_use/confirm:
+    post:
+      tags:
+      - Document
+      responses:
+        200:
+          description: ok
+  /files/term_of_use:
+    post:
+      tags:
+      - Document
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            fileName:
+              type: string
+      responses:
+        200:
+          description: ok
+    get:
+      tags:
+      - Document
+      responses:
+        200:
+          description: ok
+  /files/documents/installing:
+    post:
+      tags:
+      - Document
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            uri:
+              type: string
+            session:
+              type: string
+      responses:
+        200:
+          description: ok
+  /files/documents/sbis_types:
+    get:
+      tags:
+      - Document
+      responses:
+        200:
+          description: ok
+  /files/documents:
+    post:
+      tags:
+      - Document
+      summary: Создать документ(регистрация документа)
+      parameters:
+      - in: body
+        name: body
+        schema:
+          $ref: '#/definitions/DocumentCreate'
+      responses:
+        200:
+          description: ОК
+        500:
+          description: Ошибка сервер
+    get:
+      tags:
+      - Document
+      summary: Список документов
+      parameters:
+      - in: query
+        name: sbisTypes
+        type: array
+        items:
+          type: string
+      responses:
+        200:
+          description: Список документов с пагинацией + количество документов по каждому типу
+          schema:
+            type: object
+            properties:
+              documents:
+                type: array
+                items:
+                  $ref: '#/definitions/Document'
+              deleteDocuments:
+                type: array
+                items:
+                  $ref: '#/definitions/Document'
+              signedDocuments:
+                type: array
+                items:
+                  $ref: '#/definitions/Document'
+              considerationDocuments:
+                type: array
+                items:
+                  $ref: '#/definitions/Document'
+              countOfType:
+                type: string
+                description: В этом поле будет объект в котором каждом типе указано количество документов
+        500:
+          description: Ошибка сервера
+    delete:
+      tags:
+      - Document
+      parameters:
+      - in: query
+        name: contr_UID
+        type: string
+        required: true
+      responses:
+        200:
+          description: ОК
+        500:
+          description: Ошибка сервера
+  /files/documents/remove:
+    delete:
+      tags:
+      - Document
+      description: Переместить файл с папку удаленные
+      parameters:
+      - in: query
+        name: contr_UID
+        type: string
+        required: true
+      responses:
+        200:
+          description: ОК
+        500:
+          description: Ошибка сервера
+  /files/documents/put_off:
+    put:
+      tags:
+      - Document
+      summary: Анулировать 
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            contr_UID:
+              type: string
+            putOff:
+              type: boolean
+      responses:
+        200:
+          description: ok
+  /files/documents/cancellation:
+    put:
+      tags:
+      - Document
+      summary: Анулировать 
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            contr_UID:
+              type: string
+            comment:
+              type: string
+            sert_token:
+              type: string
+            files:
+              type: array
+              items:
+                type: object
+                properties:
+                  fileName:   
+                    type: string
+                  sign:
+                    type: string
+                  doc_uid:
+                    type: string
+      responses:
+        200:
+          description: ok
+  /files/documents/prepare_deviation:
+    put:
+      tags:
+      - Document
+      summary: Отклонить 
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            contr_UID:
+              type: string
+            sert_token:
+              type: string
+      responses:
+        200:
+          description: ok
+  /files/documents/deviation:
+    put:
+      tags:
+      - Document
+      summary: Отклонить 
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            contr_UID:
+              type: string
+            sert_token:
+              type: string
+            comment:
+              type: string
+            files:
+              type: array
+              items:
+                type: object
+                properties:
+                  fileName:   
+                    type: string
+                  sign:
+                    type: string
+                  doc_uid:
+                    type: string
+      responses:
+        200:
+          description: ok
+  /files/documents/marker:
+    put:
+      tags:
+      - Document
+      summary: Пометить документ
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            contr_UID:
+              type: string
+            marker:
+              type: boolean
+      responses:
+        200:
+          description: ok
+  /files/documents/approving/prepare:
+    put:
+      tags:
+      - Document
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            contr_UID:
+              type: string
+              description: id документа до подписания
+            sert_token:
+              type: string
+      responses:
+        200:
+          description: ОК
+        409:
+          description: Документ до подписания не существует
+  /files/documents/approving:
+    put:
+      tags:
+      - Document
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            contr_UID:
+              type: string
+              description: id документа до подписания
+            comment:
+              type: string
+            sert_token:
+              type: string
+            files:
+              type: array
+              items:
+                type: object
+                properties:
+                  fileName:
+                    type: string
+                  sign:
+                    type: string
+                  doc_uid:
+                    type: string
+      responses:
+        200:
+          description: ОК
+        409:
+          description: Документ до подписания не существует
+  /files/documents/sign:
+    post:
+      tags:
+      - Document
+      summary: Сохранить подпись
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            sert_token:
+              type: string
+            contr_UID:
+              type: string
+            files:
+              type: array
+              items:
+                type: object
+                properties:
+                  fileName:
+                    type: string
+                  sign:
+                    type: string
+                  doc_uid:
+                    type: string
+      responses:
+        200:
+          description: ok
+  /files/documents/send_to_saved_sign:
+    post:
+      tags:
+      - Document
+      summary: Отправить на подпись(сохраненную)
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            contr_UID:
+              type: string
+      responses:
+        200:
+          description: ok
+  /files/signed_documents:
+    post:
+      tags:
+      - Document
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            contr_UID:
+              type: string
+              description: id документа до подписания
+            files:
+              type: array
+              items:
+                type: object
+                properties:
+                  doc_uid:
+                    type: string
+                  sign:
+                    type: string
+                  fileName:
+                    type: string
+            sert_token:
+              type: string
+      responses:
+        200:
+          description: ОК
+        409:
+          description: Документ до подписания не существует
+  /files/documents/{id}/attachment:
+    post:
+      tags:
+      - Document
+      parameters:
+      - in: path
+        type: string
+        name: id
+        required: true
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            files:
+              type: array
+              items:
+                type: string
+            contr_UID:
+              type: string
+      responses:
+        200:
+          description: ok
+  /files/documents/attachment:
+    get:
+      tags:
+      - Document
+      parameters:
+      - in: query
+        name: contr_UID
+        required: true
+        type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              file:
+                type: string
+        400:
+          description: Введите contr_UID
+        500:
+          description: Ошибка сервера
+  /files/documents/history:
+    get:
+      tags:
+      - Document
+      summary: история документа
+      parameters:
+      - in: query
+        name: contr_UID
+        type: string
+      - in: query
+        name: doc_uid
+        type: string
+      - in: query
+        name: state
+        type: string
+      - in: query
+        name: subLoginId
+        type: string
+      responses:
+        200:
+          description: ok
+  /files/documents/qGetDocInForm:
+    get:
+      tags:
+      - Document
+      parameters:
+      - in: query
+        name: viewed
+        type: boolean
+      - in: query
+        name: page
+        type: number
+      - in: query
+        name: limit
+        type: number
+      responses:
+        200:
+          description: ok
+  /files/documents/qGetDocInForm/{id}:
+    get:
+      tags:
+      - Document
+      parameters:
+      - in: path
+        name: id
+        type: string
+        required: true
+      responses:
+        200:
+          description: ok
+definitions:
+  Region: 
+    type: object
+    properties:
+      _id:
+        type: string
+      logo: 
+        type: string
+        description: Название файла логотипа, можно получить по /media/:filename
+      name: 
+        type: string
+        description: Имя региона
+      pay: 
+        type: object
+        properties:
+          typePaymentCode:
+            type: string
+            description: Вид перевода. Идентификатор, обозначающий, что платеж поступил из ЛК ЮЛ ЮЗДО, не нужно отправлять пока что
+          lspu:
+            type: string
+            description: Лицевой счет у Поставщика услуг
+          pointCode:
+            type: string
+            description: Точка приема
+          abonentId:
+            type: string
+            description: Абонент
+          idpu:
+            type: string
+            description: Поставщик
+          service:
+            type: string
+            description: Услуга
+      contacts:
+        type: object
+        properties:
+          consumerAdministrationEmail: 
+            type: string
+            description: Управление по работе с потребителями газа
+          communityAdministrationEmail: 
+            type: string
+            description: Управление по работе с населением
+          supportEmail: 
+            type: string
+            description: Почта поддержки
+          technicalSupportEmail: 
+            type: string
+            description: Почта технической поддержки
+  Pagination:
+    type: object
+    properties:
+      next: 
+        type: number
+      prev:
+        type: number
+      total:
+        type: number
+      limit:
+        type: number
+      page:
+        type: number
+  Tabs:
+    type: array
+    items:
+      $ref: '#/definitions/Tab'
+  Tab:
+    type: object
+    properties:
+      name:
+        type: string
+      read: 
+        type: boolean
+      write:
+        type: boolean
+  User:
+    type: object
+    properties:
+      email:
+        type: string
+      confirm:
+        type: boolean
+  Role:
+    type: object
+    properties:
+      _id:
+        type: string
+      login:
+        type: string
+      tabs:
+        type: array
+        items:
+          type: string
+      firstName:
+        type: string
+      lastName:
+        type: string
+      middleName:
+        type: string
+      rights:
+        type: array
+        items:
+          type: string
+      blocked:
+        type: boolean
+  Document:
+    type: object
+    properties:
+      owner_name:
+        type: string
+        description: В данный момент отправляем для теста любое
+      document_type:
+        type: string
+        description: Варианты типов документа пока неизвестны
+      contr_UID:  
+        type: string
+      contr_date:
+        type: string
+      owner_UID:
+        type: string
+      contr_num:
+        type: string
+      contr_status:
+        type: string
+      receiver_UID:
+        type: string
+      receiver_name:
+        type: string
+  DocumentCreate:
+    type: object
+    properties:
+      userFileName:
+        type: string
+      files:
+        type: array
+        items:
+          type: string
+      senderName:
+        type: string
+      senderType: 
+        type: string
+      senderEmail:
+        type: string
+      owner_name:
+        type: string
+        description: В данный момент отправляем для теста любое
+      document_type:
+        type: string
+        description: Варианты типов документа пока неизвестны
+      contr_UID:  
+        type: string
+      contr_date:
+        type: string
+      contr_num:
+        type: string
+      contr_status:
+        type: string
+      baseId:
+        type: string
+  Consumer:
+    type: object
+    properties:
+      cons_short_name:
+        type: string
+      cons_full_name:
+        type: string
+      cons_OGRN:
+        type: string
+      OKOGU:
+        type: string
+      OKOPF:
+        type: string
+      OKFS:
+        type: string
+      OKTMO:
+        type: string
+      cons_INN:
+        type: string
+      cons_UID:
+        type: string
+      cons_KPP:
+        type: string
+      cur_fio:
+        type: string
+      loc_addr:
+        type: string
+      legal_addr:
+        type: string
+      post_addr:
+        type: string
+      OKK:
+        type: string
+      OKVED:
+        type: string
+      OKPO:
+        type: string
+      mun_distr:
+        type: string
+      dir_fio:
+        type: string
+      dir_st_auth:
+        type: string
+      dir_role:
+        type: string
+      dir_phone:
+        type: string
+      dir_email:
+        type: string
+      buh_fio:
+        type: string
+      buh_role:
+        type: string
+      buh_phone:
+        type: string
+      buh_email:
+        type: string
+      doc_manager:
+        type: string
+      doc_manager_role:
+        type: string
+      doc_manager_email:
+        type: string
+      curr_acc:
+        type: string
+      corr_acc:
+        type: string
+      BIK:
+        type: string
+      KBK:
+        type: string
+      pers_acc:
+        type: string
+      org_type:
+        type: string
+  Contract:
+    type: object
+    properties:
+      contr_num:
+        type: string
+      contr_date:
+        type: string
+      contr_status:
+        type: string
+      curr_balance:
+        type: string
+      contr_st_date:  
+        type: string
+      contr_end_date:
+        type: string
+      Abon_dep:
+        type: string
+      cur_fio:
+        type: string
+      cur_phone:
+        type: string
+      cur_email:
+        type: string
+      contr_scan:
+        type: string
+      FZ44:
+        type: boolean
+      FZ223:
+        type: boolean
+      Budg_ch_contr:
+        type: string
+      budg_level:
+        type: string
+      receivers:
+        type: array
+        items:
+          type: object
+          properties:
+            example:
+              type: string
+      budg_limit:
+        type: string
+      budg_type:  
+        type: string
+      budg_contr_price:
+        type: number
+      other_contr_price:
+        type: number
+      budg_gas_vol:
+        type: number
+      other_gas_vol:
+        type: number
+      mets:
+        type: array
+        items:
+          type: object
+          properties:
+            example:
+              type: string
+      Cons_points:
+        type: array
+        items:
+          type: object
+          properties:
+            example:
+              type: string
+  Location:
+    type: object
+    properties:
+      location_uuid:
+        type: string
+      location_Name:
+        type: string
+      location_address:
+        type: string
+      met_units:
+        type: array
+        items:
+          $ref: '#/definitions/Met'
+  Met:
+    type: object
+    properties:
+      Met_uuid:
+        type: string
+      Met_name:
+        type: string
+      equipments:
+        $ref: '#/definitions/Equipment'
+  Equipment:
+    type: object
+    properties:
+      equipment_uuid:
+        type: string
+      Equipment_type:
+        type: string
+      equipment_name: 
+        type: string
+      Equipment_max_power:
+        type: string
+      serial_number:
+        type: string
+      Work:
+        type: boolean
+      Values:
+        type: array
+        items:
+          type: object
+          properties:
+            Dt_value:
+              type: string
+            Value:
+              type: string
+            basic:
+              type: string
+  ContractFactSum:
+    type: object
+    properties:
+      month: 
+        type: string
+      cons_point: 
+        type: string
+      Met_UID: 
+        type: string
+      fact_vol: 
+        type: number
+      cons_type_UID: 
+        type: string
+      fact_sum: 
+        type: number
+      transp_sum: 
+        type: number
+      Transit_sum: 
+        type: number
+      calorific_sum: 
+        type: number
+      'coef1.1': 
+        type: number
+      'coef1.5': 
+        type: number
+      contr_UID:
+        type: string
+      cor_sum: 
+        type: number
+      unlim_fee: 
+        type: number
+      overlim_fee:
+        type: number
+      stale_debt_sum: 
+        type: number
+  ContractPayment:
+    type: object
+    properties:
+      contr_UID: 
+        type: string
+      payment_det: 
+        type: string
+      doc_type:
+        type: string
+      Doc_date: 
+        type: string
+      Doc_num: 
+        type: number
+      pay_sum: 
+        type: number
+      pay_status: 
+        type: string
+  ContractBalance:
+    type: object
+    properties:
+      cons_type: 
+        type: string
+      st_balance:
+        type: string
+      fact_sum:
+        type: string
+      pay_sum:
+        type: string
+      end_balance:
+        type: string
+  ContractList:
+    type: array
+    items:
+      type: object
+      properties:
+        contr_UID:
+          type: string
+        cons_UID:
+          type: string
+        contr_num:
+          type: string
+        contr_date:
+          type: string
+        contr_status:
+          type: string
+        curr_bakance:
+          type: string
+  request:
+    type: object
+    properties:
+      type:
+        type: string
+        description: login/reg
+      organizationInn:
+        type: string
+      files:
+        type: array
+        items:
+          type: string
+          description: название файла полученное после загрузки файла
+      organizationName:
+        type: string
+      firstName:
+        type: string
+      middleName:
+        type: string
+      lastName:
+        type: string
+      positionUser:
+        type: string
+      email:
+        type: string
+      phone:
+        type: string
+      comment:
+        type: string
+  token:
+    type: object
+    properties:
+      token:
+        type: string
+      _id:
+        type: string
+        description: id пользователя
