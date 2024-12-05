@@ -9,7 +9,11 @@
     "migration-to-2.1": "PROFILE=develop node scripts/migrations/2.0.5-to-2.1.js",
     "migration-to-2.1.6": "PROFILE=prod node scripts/migrations/to-2.0.6.js",
     "test": "mocha tests/**/*.js",
-    "db_values": "env TOKEN_ACTIVITY_PERIOD=10 node scripts/defaultDBValues.js"
+    "db_values": "env TOKEN_ACTIVITY_PERIOD=10 node scripts/defaultDBValues.js",
+    "docker:db": "docker compose -f ./docker-compose.db.yml down && docker compose -f ./docker-compose.db.yml up -d --build",
+    "docker:db:down": "docker compose -f ./docker-compose.db.yml down",
+    "docker:dev": "docker compose -f ./docker-compose.dev.yml down && docker compose -f ./docker-compose.dev.yml up --build",
+    "docker:dev:down": "docker compose -f ./docker-compose.dev.yml down"
   },
   "repository": {
     "type": "git",
