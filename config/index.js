@@ -1,5 +1,6 @@
 const dotenv = require("dotenv");
 const path = require("path");
+const fs = require("node:fs");
 
 const { PROFILE } = process.env;
 
@@ -130,4 +131,11 @@ module.exports = {
   smorodina: {
     url: config.SMORODINA_URL,
   },
+  keycloak_certs: [
+      fs.readFileSync(config.KEYCLOAK_DEV_CERT),
+      fs.readFileSync(config.KEYCLOAK_DEV_TEST),
+      fs.readFileSync(config.KEYCLOAK_DEV_CA),
+      fs.readFileSync(config.KEYCLOAK_DEV_ROOT),
+  ],
+  keycloak_config: require(config.KEYCLOAK_CONFIG_PATH),
 };
