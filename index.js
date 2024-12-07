@@ -21,6 +21,9 @@ app.use(require('cors')({
     'optionsSuccessStatus': 200
 }) );
 
+// Инициализация Keycloak
+require('./libs/keycloak')(app, config);
+
 app.use((req, _res, next) => {
     console.log(`${new Date()} ${req.ip}:${req.method} ${req.url}`);
     next();
