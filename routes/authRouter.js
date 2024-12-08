@@ -37,10 +37,10 @@ class AuthRouter {
 
     async handleCallback(req, res) {
         try {
-            res.redirect(this.authController.getRedirectUri());
+            return res.redirect(this.authController.getRedirectUri());
         } catch (error) {
             console.error(`[KEYCLOAK]: Ошибка при логауте:', ${error.message}`);
-            res.status(500).json({ message: 'Внутрення ошибка сервера' });
+            res.status(500).json({ error: 'Ошибка при логауте' });
         }
     }
 
@@ -51,10 +51,6 @@ class AuthRouter {
                 return res.status(400).json({ error: 'Поля userId и regionId обязательны' });
             }
             const user = await this.authController.updateUserRegion({ userId, regionId });
-
-            console.log({ userId, regionId });
-            console.log({ user });
-            console.log({ password: this.authController.getDefaultPassword() });
 
             const ip = requestIp.getClientIp(req);
             req.body.ip = ip;
@@ -67,7 +63,12 @@ class AuthRouter {
 
         } catch (error) {
             console.error(`[KEYCLOAK]: Ошибка при обновлении региона или логине: ${error.message}`);
-            res.status(500).json({ error: 'Внутрення ошибка сервера' });
+            if (error.isBoom) {
+                return res.status(error.output.statusCode).json({
+                    error: error.message,
+                });
+            }
+            res.status(500).json({ error: 'Внутренняя ошибка сервера' });
         }
     }
 
@@ -75,24 +76,29 @@ class AuthRouter {
         try {
             const kuser = req.kauth.grant.access_token.content;
             if (kuser) {
-                const { existingUser, existsSubLogin } = await this.authController.findUserByEmail({
+                const { existsUser } = await this.authController.findUserByEmail({
                     email: kuser.email,
                 });
-                if (!existingUser) {
-                    const { subLogin } = await this.authController.createUser({
+                if (!existsUser) {
+                    const { user } = await this.authController.createUser({
                         userInfo: kuser,
                     })
                     return res.redirect(
-                        `${this.authController.getRedirectUri()}/signin/bid?id=${subLogin._id}&select-region=true`
+                        `${this.authController.getRedirectUri()}/signin/bid?id=${user._id}&select-region=true`
                     );
                 }
                 return res.redirect(
-                    `${this.authController.getRedirectUri()}/signin/bid?id=${existsSubLogin._id}&auth=true`
+                    `${this.authController.getRedirectUri()}/signin/bid?id=${existsUser._id}&auth=true`
                 );
             }
         } catch (error) {
             console.error(`[KEYCLOAK]: Ошибка при логине:', ${error.message}`);
-            res.status(500).json({ message: 'Внутрення ошибка сервера' });
+            if (error.isBoom) {
+                return res.status(error.output.statusCode).json({
+                    error: error.message,
+                });
+            }
+            res.status(500).json({ error: 'Внутренняя ошибка сервера' });
         }
     }
 

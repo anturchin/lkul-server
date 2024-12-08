@@ -1,4 +1,5 @@
-const { notFound } = require('boom');
+const { notFound, conflict  } = require('boom');
+const { Types } = require("mongoose");
 const crypto = require('node:crypto');
 const https = require('node:https');
 const session = require('express-session');
@@ -50,9 +51,9 @@ class AuthController {
     }
 
     async updateUserRegion({ userId, regionId }) {
-        const user = await User.findByIdAndUpdate(
-            userId,
-            { regionId },
+        const user = await User.findOneAndUpdate(
+            { _id: Types.ObjectId(userId) },
+            { regionId: Types.ObjectId(regionId) },
             { new: true }
         );
         if (!user) {
@@ -62,7 +63,7 @@ class AuthController {
     }
 
     async findUserByEmail({ email }) {
-        const [existsUser, existsSubLogin] = await Promise.all([
+        const [ existsUser, existsSubLogin ] = await Promise.all([
             User.findOne({email}),
             SubLogin.findOne({login: email})
         ]);
@@ -70,6 +71,13 @@ class AuthController {
     }
 
     async createUser({ userInfo }) {
+
+        const { existsUser } = await this.findUserByEmail({ email: userInfo.email });
+
+        if (existsUser) {
+            throw conflict('Пользователь с таким email уже существует');
+        }
+
         const hash = await this.generateHashPassword({
             password: this.config.defaultUserPassword,
         });
