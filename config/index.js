@@ -1,6 +1,6 @@
 const dotenv = require("dotenv");
 const path = require("path");
-const fs = require("node:fs");
+const readFileSafely = require("../libs/readFileSafely");
 
 const { PROFILE } = process.env;
 
@@ -66,13 +66,13 @@ switch (PROFILE) {
 }
 
 const keycloakСerts = [
-  fs.readFileSync(config.KEYCLOAK_DEV_CERT).toString(),
-  fs.readFileSync(config.KEYCLOAK_DEV_TEST).toString(),
-  fs.readFileSync(config.KEYCLOAK_DEV_CA).toString(),
-  fs.readFileSync(config.KEYCLOAK_DEV_ROOT).toString(),
+  readFileSafely(config.KEYCLOAK_DEV_CERT),
+  readFileSafely(config.KEYCLOAK_DEV_TEST),
+  readFileSafely(config.KEYCLOAK_DEV_CA),
+  readFileSafely(config.KEYCLOAK_DEV_ROOT),
 ];
 
-const keycloakConfig = fs.readFileSync(config.KEYCLOAK_CONFIG_PATH).toString();
+const keycloakConfig = readFileSafely(config.KEYCLOAK_CONFIG_PATH);
 
 module.exports = {
   port: config.PORT,
