@@ -12,10 +12,6 @@ class AuthController {
 
     initializeKeycloak() {
         new https.Agent({ ca: this.config.keycloakСerts });
-
-        const secretLength = parseInt(this.config.sessionSecret, 10) || 32;
-        const secret = crypto.randomBytes(secretLength).toString('hex');
-
         return new Keycloak(
             { store: this.memoryStore },
             this.config.keycloakConfig
@@ -23,15 +19,16 @@ class AuthController {
     }
 
     setupMiddleware(app) {
+        const secretLength = parseInt(this.config.sessionSecretLength, 10) || 32;
+        const secret = crypto.randomBytes(secretLength).toString('hex');
         app.use(
             session({
-                secret: crypto.randomBytes(32).toString('hex'),
+                secret,
                 resave: false,
                 saveUninitialized: true,
                 store: this.memoryStore,
             })
         );
-
         app.use(this.keycloak.middleware());
     }
 

@@ -141,7 +141,7 @@ module.exports = {
     url: config.SMORODINA_URL,
   },
   keycloakСerts,
-  sessionSecret: config.SESSION_SECRET_LENGTH,
+  sessionSecretLength: config.SESSION_SECRET_LENGTH,
   redirectUri: config.REDIRECT_URI,
   keycloakConfig: JSON.parse(keycloakConfig),
 };
