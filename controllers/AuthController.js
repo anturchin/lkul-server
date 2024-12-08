@@ -52,13 +52,21 @@ class AuthController {
         return this.keycloak;
     }
 
+    async findUserById({ userId }) {
+        const subLogin = await SubLogin.findById(userId);
+        if (!subLogin) {
+            throw notFound('Пользователь не найден');
+        }
+        return subLogin;
+    }
+
     async simpleLogin({ login }){
         this._validateLoginInput({ login });
 
         const subLogin = await this._findSubLoginByLogin({ login });
         this._checkUserStatus({ subLogin });
 
-        const consumers = await this._fetchConsumers({ userId: subLogin._id })
+        const consumers = await this._fetchConsumers({ userId: subLogin._id });
 
         const cons = this._filterConsumers({
           consumers,
@@ -101,7 +109,7 @@ class AuthController {
             User.findOne({email}),
             SubLogin.findOne({login: email})
         ]);
-        return { existsUser, existsSubLogin }
+        return { existsUser, existsSubLogin };
     }
 
     async createUser({ userInfo }) {

@@ -23,13 +23,13 @@ class AuthRouter {
 
         this.router.post(
             '/keycloak/tokens',
-            () => {}
-        )
+            this.handleKeycloakTokens.bind(this)
+        );
 
         this.router.post(
             '/keycloak/region',
             this.handleRegionUpdateAndLogin.bind(this)
-        )
+        );
 
         this.router.use(
             this.keycloak.middleware({ logout: '/keycloak/logout' })
@@ -40,8 +40,32 @@ class AuthRouter {
         try {
             return res.redirect(this.authController.getRedirectUri());
         } catch (error) {
-            console.error(`[KEYCLOAK]: Ошибка при логауте:', ${error.message}`);
-            res.status(500).json({ error: 'Ошибка при логауте' });
+            console.error(`[KEYCLOAK]: Ошибка при получении URI для редиректа: ${error.message}`);
+            res.status(500).json({ error: 'Ошибка при редиректе' });
+        }
+    }
+
+    async handleKeycloakTokens(req, res) {
+        try {
+            const { userId } = req.body;
+            if (!userId) {
+                throw badRequest('Поле userId обязательно');
+            }
+
+            const subLogin = await this.authController.findUserById({ userId });
+
+            this.setIp(req);
+
+            const result = await this.authController.simpleLogin({ login: subLogin.login })
+            res.send(result);
+        } catch (error) {
+            console.error(`[KEYCLOAK]: Ошибка при логине и получении токенов: ${error.message}`);
+            if (error.isBoom) {
+                return res.status(error.output.statusCode).json({
+                    error: error.message,
+                });
+            }
+            res.status(500).json({ error: 'Внутренняя ошибка сервера' });
         }
     }
 
@@ -53,8 +77,7 @@ class AuthRouter {
             }
             const user = await this.authController.updateUserRegion({ userId, regionId });
 
-            const ip = requestIp.getClientIp(req);
-            req.body.ip = ip;
+            this.setIp(req);
 
             const result = await login({
                 login: user.email,
@@ -63,7 +86,7 @@ class AuthRouter {
             res.send(result);
 
         } catch (error) {
-            console.error(`[KEYCLOAK]: Ошибка при обновлении региона или логине: ${error.message}`);
+            console.error(`[KEYCLOAK]: Ошибка при логине с регионом: ${error.message}`);
             if (error.isBoom) {
                 return res.status(error.output.statusCode).json({
                     error: error.message,
@@ -75,25 +98,27 @@ class AuthRouter {
 
     async handleKeycloakLogin(req, res) {
         try {
-            const kuser = req.kauth.grant.access_token.content;
-            if (kuser) {
-                const { existsUser } = await this.authController.findUserByEmail({
-                    email: kuser.email,
-                });
-                if (!existsUser) {
-                    const { user } = await this.authController.createUser({
-                        userInfo: kuser,
-                    })
-                    return res.redirect(
-                        `${this.authController.getRedirectUri()}/signin/bid?id=${user._id}&select-region=true`
-                    );
-                }
+            const kuser = req.kauth?.grant?.access_token?.content;
+            if (!kuser) {
+                throw badRequest('Нет данных о пользователе');
+            }
+            const { existsUser } = await this.authController.findUserByEmail({
+                email: kuser.email,
+            });
+            if (!existsUser) {
+                const { user } = await this.authController.createUser({
+                    userInfo: kuser,
+                })
                 return res.redirect(
-                    `${this.authController.getRedirectUri()}/signin/bid?id=${existsUser._id}&auth=true`
+                    `${this.authController.getRedirectUri()}/signin/bid?id=${user._id}&select-region=true`
                 );
             }
+            return res.redirect(
+                `${this.authController.getRedirectUri()}/signin/bid?id=${existsUser._id}&auth=true`
+            );
+
         } catch (error) {
-            console.error(`[KEYCLOAK]: Ошибка при логине:', ${error.message}`);
+            console.error(`[KEYCLOAK]: Ошибка при логине: ${error.message}`);
             if (error.isBoom) {
                 return res.status(error.output.statusCode).json({
                     error: error.message,
@@ -101,6 +126,11 @@ class AuthRouter {
             }
             res.status(500).json({ error: 'Внутренняя ошибка сервера' });
         }
+    }
+
+    setIp(req){
+        const ip = requestIp.getClientIp(req);
+        req.body.ip = ip;
     }
 
     getRouter() {
