@@ -37,7 +37,6 @@ class AuthRouter {
 
     async handleCallback(req, res) {
         try {
-            console.log({ grant: req.kauth.grant });
             res.redirect(this.authController.getRedirectUri());
         } catch (error) {
             console.error(`[KEYCLOAK]: Ошибка при логауте:', ${error.message}`);
@@ -71,12 +70,9 @@ class AuthRouter {
         try {
             const kuser = req.kauth.grant.access_token.content;
             if (kuser) {
-                console.log({ kuser });
-
                 const { existingUser, existsSubLogin } = await this.authController.findUserByEmail({
                     email: kuser.email,
                 });
-
                 if (!existingUser) {
                     const { subLogin } = await this.authController.createUser({
                         userInfo: kuser,
@@ -85,7 +81,6 @@ class AuthRouter {
                         `${this.authController.getRedirectUri()}/signin/bid?id=${subLogin._id}&select-region=true`
                     );
                 }
-
                 return res.redirect(
                     `${this.authController.getRedirectUri()}/signin/bid?id=${existsSubLogin._id}&auth=true`
                 );
