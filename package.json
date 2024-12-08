@@ -23,7 +23,7 @@
     "url": "https://gitlab.com/MusAushev/gas.back/issues"
   },
   "homepage": "https://gitlab.com/MusAushev/gas.back#readme",
-  "depen dencies": {
+  "dependencies": {
     "@supercharge/promise-pool": "^1.8.0",
     "@types/jest": "^26.0.19",
     "async": "^3.1.0",

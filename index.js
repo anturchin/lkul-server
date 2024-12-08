@@ -5,7 +5,7 @@ const port = config.port;
 
 // Keycloak
 const AuthController = require('./controllers/AuthController');
-const createAuthRouter = require('./routes/authRouter');
+const AuthRouter = require('./routes/authRouter');
 // ===========================================================================
 
 const {notFound} = require('boom');
@@ -16,6 +16,7 @@ require('./scripts/defaultDBValues');
 require('./scripts/roles');
 require('./scripts/insertRolsForAllUsers');
 require('./scripts/createMrgOrg');
+
 app.use(express.urlencoded({extended:true, limit: '10mb'}));
 app.use(express.json({limit: '10mb'}));
 
@@ -27,9 +28,11 @@ app.use(require('cors')({
 }) );
 
 // Keycloak
-const authController = new AuthController(config);
+const authController = new AuthController({ config });
 authController.setupMiddleware(app);
-const authRouter = createAuthRouter(authController);
+const authRouter = new AuthRouter({
+    authController,
+});
 // ===========================================================
 
 app.use((req, _res, next) => {
@@ -41,8 +44,8 @@ app.use('/media', express.static('./media'));
 app.use('/api', require('./routes'));
 
 // Keycloak
-app.use('/auth', authRouter);
-// ==========================
+app.use('/auth', authRouter.getRouter());
+// =====================================
 
 app.use((_req, _res, next) => {
     next(notFound('Not found'));

@@ -66,13 +66,13 @@ switch (PROFILE) {
 }
 
 const keycloakСerts = [
-  readFileSafely(config.KEYCLOAK_DEV_CERT),
-  readFileSafely(config.KEYCLOAK_DEV_TEST),
-  readFileSafely(config.KEYCLOAK_DEV_CA),
-  readFileSafely(config.KEYCLOAK_DEV_ROOT),
+  readFileSafely(path.resolve(config.KEYCLOAK_DEV_CERT)),
+  readFileSafely(path.resolve(config.KEYCLOAK_DEV_TEST)),
+  readFileSafely(path.resolve(config.KEYCLOAK_DEV_CA)),
+  readFileSafely(path.resolve(config.KEYCLOAK_DEV_ROOT)),
 ];
 
-const keycloakConfig = readFileSafely(config.KEYCLOAK_CONFIG_PATH);
+const keycloakConfig = readFileSafely(path.resolve(config.KEYCLOAK_CONFIG_PATH));
 
 module.exports = {
   port: config.PORT,
@@ -144,4 +144,5 @@ module.exports = {
   sessionSecretLength: config.SESSION_SECRET_LENGTH,
   redirectUri: config.REDIRECT_URI,
   keycloakConfig: JSON.parse(keycloakConfig),
+  defaultUserPassword: config.DEFAULT_USER_PASSWORD,
 };
