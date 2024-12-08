@@ -51,6 +51,11 @@ class AuthRouter {
                 return res.status(400).json({ error: 'Поля userId и regionId обязательны' });
             }
             const user = await this.authController.updateUserRegion({ userId, regionId });
+
+            console.log({ userId, regionId });
+            console.log({ user });
+            console.log({ password: this.authController.getDefaultPassword() });
+
             const ip = requestIp.getClientIp(req);
             req.body.ip = ip;
 
