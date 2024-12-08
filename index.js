@@ -3,6 +3,11 @@ const app = express();
 const config = require('./config');
 const port = config.port;
 
+// Keycloak
+const AuthController = require('./controllers/AuthController');
+const createAuthRouter = require('./routes/authRouter');
+// ===========================================================================
+
 const {notFound} = require('boom');
 const mongooseValidationErrors = require('./libs/mongooseValidationErrors');
 
@@ -21,18 +26,23 @@ app.use(require('cors')({
     'optionsSuccessStatus': 200
 }) );
 
-// Инициализация Keycloak
-require('./libs/keycloak')(app, config);
+// Keycloak
+const authController = new AuthController(config);
+authController.setupMiddleware(app);
+const authRouter = createAuthRouter(authController);
+// ===========================================================
 
 app.use((req, _res, next) => {
     console.log(`${new Date()} ${req.ip}:${req.method} ${req.url}`);
     next();
 });
-
 app.use('/public', express.static('./public'));
 app.use('/media', express.static('./media'));
-
 app.use('/api', require('./routes'));
+
+// Keycloak
+app.use('/auth', authRouter);
+// ==========================
 
 app.use((_req, _res, next) => {
     next(notFound('Not found'));
