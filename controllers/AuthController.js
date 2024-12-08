@@ -1,4 +1,4 @@
-const { notFound, conflict  } = require('boom');
+const { notFound, conflict, badRequest, unauthorized  } = require('boom');
 const { Types } = require("mongoose");
 const crypto = require('node:crypto');
 const https = require('node:https');
@@ -8,6 +8,8 @@ const auth = require('vvdev-auth');
 const User = require("../models/User");
 const SubLogin = require("../models/SubLogin");
 const { createDefaultRoles } = require("./UserController");
+const { Consumer } = require("../models");
+const { sign } = require("../libs/jwt");
 
 class AuthController {
     constructor({ config }) {
@@ -48,6 +50,38 @@ class AuthController {
 
     getKeycloak() {
         return this.keycloak;
+    }
+
+    async simpleLogin({ login }){
+        this._validateLoginInput({ login });
+
+        const subLogin = await this._findSubLoginByLogin({ login });
+        this._checkUserStatus({ subLogin });
+
+        const consumers = await this._fetchConsumers({ userId: subLogin._id })
+
+        const cons = this._filterConsumers({
+          consumers,
+          regionId: subLogin.user.regionId,
+        });
+
+        const token = await this._generateToken({ subLogin });
+
+        return {
+            token,
+            _id: subLogin._id,
+            tabs: subLogin.tabs,
+            type: subLogin.type,
+            regionId: subLogin.user.regionId,
+            cons_UIDs: cons.length ? cons.map((c) => c.cons_UID) : null,
+            consumers: cons.length
+                ? cons.map((c) => ({
+                    cons_full_name: c.cons_full_name,
+                    cons_UID: c.cons_UID,
+                }))
+                : null,
+        };
+
     }
 
     async updateUserRegion({ userId, regionId }) {
@@ -95,6 +129,59 @@ class AuthController {
 
     async generateHashPassword({ password }) {
         return auth.hashPassword(password);
+    }
+
+    _checkUserStatus({ subLogin }){
+        if (subLogin.blocked || !subLogin.user || subLogin.user.blocked) {
+            throw unauthorized(
+                'Пользователь заблокирован Web-администратором ЛКЮЛ. Для получения информации обратитесь F0500509@gazmsk.ru'
+            );
+        }
+    }
+
+    _validateLoginInput({ login }){
+        if (!login) {
+            throw badRequest('Логин не указан');
+        }
+    }
+
+    _filterConsumers({ consumers, regionId }) {
+        return consumers.filter((c) => {
+            if (!c.ssdUri || !c.ssdUri.regionId || !regionId) {
+                return false;
+            }
+            return c.ssdUri.regionId.toString() === regionId.toString();
+        });
+    }
+
+    async _generateToken({ subLogin }){
+        const body = {
+            _id: subLogin._id,
+            date: new Date(),
+            login: subLogin.login,
+            regionId: subLogin.user.regionId,
+        };
+        const token = await sign(body);
+        return token;
+    }
+
+    async _fetchConsumers({ userId }) {
+        return Consumer.find({
+            user: userId,
+            blocked: { $ne: true },
+        })
+            .populate('ssdUri')
+            .lean();
+    }
+
+    async _findSubLoginByLogin({ login }) {
+        const logRex = new RegExp(login, 'gi');
+        const subLogin = await SubLogin.findOne({ login: logRex }).populate('user');
+
+        if (!subLogin) {
+            throw unauthorized('Пользователь не найден');
+        }
+        return subLogin;
     }
 
     async _subLoginCreate({

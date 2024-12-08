@@ -1,3 +1,4 @@
+const { badRequest } = require('boom');
 const express = require('express');
 const requestIp = require('request-ip');
 const { login } = require("../controllers/UserController");
@@ -48,7 +49,7 @@ class AuthRouter {
         try {
             const { userId, regionId } = req.body;
             if (!userId || !regionId) {
-                return res.status(400).json({ error: 'Поля userId и regionId обязательны' });
+                throw badRequest('Поля userId и regionId обязательны');
             }
             const user = await this.authController.updateUserRegion({ userId, regionId });
 
