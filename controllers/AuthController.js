@@ -1,9 +1,9 @@
+const { notFound } = require('boom');
 const crypto = require('node:crypto');
 const https = require('node:https');
 const session = require('express-session');
 const Keycloak = require('keycloak-connect');
 const auth = require('vvdev-auth');
-const jwt = require('../libs/jwt');
 const User = require("../models/User");
 const SubLogin = require("../models/SubLogin");
 const { createDefaultRoles } = require("./UserController");
@@ -37,12 +37,28 @@ class AuthController {
         app.use(this.keycloak.middleware());
     }
 
+    getDefaultPassword(){
+        return this.config.defaultUserPassword;
+    }
+
     getRedirectUri() {
         return this.config.redirectUri;
     }
 
     getKeycloak() {
         return this.keycloak;
+    }
+
+    async updateUserRegion({ userId, regionId }) {
+        const user = await User.findByIdAndUpdate(
+            userId,
+            { regionId },
+            { new: true }
+        );
+        if (!user) {
+            throw notFound('Пользователь не найден');
+        }
+        return user;
     }
 
     async findUserByEmail({ email }) {
@@ -64,13 +80,9 @@ class AuthController {
             firstName: userInfo.given_name,
             lastName: userInfo.family_name,
             middleName: null,
-            position: 'Администратор',
+            position: 'admin',
             regionId: null
         });
-    }
-
-    async generateToken({ payload }) {
-        return jwt.sign(payload);
     }
 
     async generateHashPassword({ password }) {
