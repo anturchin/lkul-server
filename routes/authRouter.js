@@ -102,7 +102,7 @@ class AuthRouter {
             if (!kuser) {
                 throw badRequest('Нет данных о пользователе');
             }
-            const { existsUser } = await this.authController.findUserByEmail({
+            const { existsUser, existsSubLogin } = await this.authController.findUserByEmail({
                 email: kuser.email,
             });
             if (!existsUser) {
@@ -114,7 +114,7 @@ class AuthRouter {
                 );
             }
             return res.redirect(
-                `${this.authController.getRedirectUri()}/signin/bid?id=${existsUser._id}&auth=true`
+                `${this.authController.getRedirectUri()}/signin/bid?id=${existsSubLogin._id}&auth=true`
             );
 
         } catch (error) {
