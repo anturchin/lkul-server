@@ -4,6 +4,7 @@ const config = require('./config');
 const port = config.port;
 
 // Keycloak
+const cookieParser = require('cookie-parser');
 const AuthController = require('./controllers/AuthController');
 const AuthRouter = require('./routes/authRouter');
 // ===========================================================================
@@ -20,11 +21,16 @@ require('./scripts/createMrgOrg');
 app.use(express.urlencoded({extended:true, limit: '10mb'}));
 app.use(express.json({limit: '10mb'}));
 
+// Keycloak
+app.use(cookieParser());
+// =====================
+
 app.use(require('cors')({
     'origin': true,
     'methods': 'GET,POST,PUT,DELETE,OPTIONS',
     'allowedHeaders': ['Content-Type', 'x-access-token', 'user-agent'],
-    'optionsSuccessStatus': 200
+    'optionsSuccessStatus': 200,
+    'credentials': true,
 }) );
 
 // Keycloak
