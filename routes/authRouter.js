@@ -31,13 +31,6 @@ class AuthRouter {
             this.handleRegionUpdateAndLogin.bind(this)
         );
 
-        // this.router.post(
-        //     '/keycloak/logout',
-        //     this.handleKeycloakLogout.bind(this)
-        // );
-
-        // this.router.use(this.keycloak.middleware());
-
         this.router.use(
             this.keycloak.middleware({ logout: '/keycloak/logout' })
         );
@@ -45,9 +38,19 @@ class AuthRouter {
 
     async handleCallback(req, res) {
         try {
+            const { userId } = req.query;
+            if(!userId) {
+                throw badRequest('Url параметр userId обязателен');
+            }
+            this._clearTokensFromCookies({ res, userId });
             return res.redirect(this.authController.getRedirectUri());
         } catch (error) {
             console.error(`[KEYCLOAK]: Ошибка при получении URI для редиректа: ${error.message}`);
+            if (error.isBoom) {
+                return res.status(error.output.statusCode).json({
+                    error: error.message,
+                });
+            }
             res.status(500).json({ error: 'Ошибка при редиректе' });
         }
     }
@@ -162,16 +165,6 @@ class AuthRouter {
         }
     }
 
-    async handleKeycloakLogout(req, res) {
-        try {
-            const token = req.body;
-            console.log(token);
-            res.send('logout');
-        } catch (error) {
-            console.error(`[KEYCLOAK]: Ошибка при логауте: ${error.message}`);
-        }
-    }
-
     getRouter() {
         return this.router;
     }
@@ -181,9 +174,26 @@ class AuthRouter {
         req.body.ip = ip;
     }
 
+    _clearTokensFromCookies({ res, userId }) {
+        res.clearCookie(`access_token_${userId}`, {
+            httpOnly: true,
+            sameSite: 'None',
+        });
+        res.clearCookie(`refresh_token_${userId}`, {
+            httpOnly: true,
+            sameSite: 'None',
+        });
+    }
+
     _getTokensFromCookies({ req, userId }) {
-        const accessToken = req.cookies[`access_token_${userId}`];
-        const refreshToken = req.cookies[`refresh_token_${userId}`];
+        const accessToken = this._validateCookie({
+            req,
+            cookieName: `access_token_${userId}`,
+        });
+        const refreshToken = this._validateCookie({
+            req,
+            cookieName: `refresh_token_${userId}`,
+        });
 
         if (!accessToken || !refreshToken) {
             throw badRequest('Токены Keycloak не найдены в куках. Пожалуйста, убедитесь, что вы прошли авторизацию.');
@@ -200,6 +210,19 @@ class AuthRouter {
             httpOnly: true,
             sameSite: 'None',
         });
+    }
+
+    _validateCookie({ req, cookieName }) {
+        if (!req.cookies) {
+            throw badRequest('Cookies не найдены в запросе.');
+        }
+
+        const cookieValue = req.cookies[cookieName];
+        if (!cookieValue) {
+            throw badRequest(`Кука "${cookieName}" не найдена.`);
+        }
+
+        return cookieValue;
     }
 
     _extractTokensFromRequest({ req }) {
