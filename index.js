@@ -28,7 +28,7 @@ app.use(cookieParser());
 app.use(require('cors')({
     'origin': true,
     'methods': 'GET,POST,PUT,DELETE,OPTIONS',
-    'allowedHeaders': ['Content-Type', 'x-access-token', 'user-agent'],
+    'allowedHeaders': ['Content-Type', 'x-access-token', 'user-agent', 'Authorization'],
     'optionsSuccessStatus': 200,
     'credentials': true,
 }) );

@@ -2,6 +2,7 @@ const { badRequest } = require('boom');
 const express = require('express');
 const requestIp = require('request-ip');
 const { login } = require("../controllers/UserController");
+const { decode } = require("jsonwebtoken");
 
 class AuthRouter {
     constructor({ authController }) {
@@ -13,30 +14,58 @@ class AuthRouter {
     }
 
     initializeRoutes() {
-        this.router.get('/callback', this.handleCallback.bind(this));
+        this.router.get('/callback', this._handleCallback.bind(this));
 
         this.router.get(
             '/keycloak/login',
             this.keycloak.protect(),
-            this.handleKeycloakLogin.bind(this)
+            this._handleKeycloakLogin.bind(this)
         );
 
         this.router.post(
             '/keycloak/tokens',
-            this.handleKeycloakTokens.bind(this)
+            this._handleKeycloakTokens.bind(this)
         );
 
         this.router.post(
             '/keycloak/region',
-            this.handleRegionUpdateAndLogin.bind(this)
+            this._handleRegionUpdateAndLogin.bind(this)
         );
+
+        this.router.post(
+            '/bid/login',
+            this._handleBidLogin.bind(this)
+        )
 
         this.router.use(
             this.keycloak.middleware({ logout: '/keycloak/logout' })
         );
     }
 
-    async handleCallback(req, res) {
+    getRouter() {
+        return this.router;
+    }
+
+    async _handleBidLogin(req, res) {
+        try {
+            const { token, ...kuser } = this._extractEmailFormRequest({ req });
+            const redirectUri = await this._processUserAndSetTokens({
+                res,
+                userInfo: kuser,
+                access_token: token,
+                refresh_token: token,
+            });
+            return res.send({ redirectUri });
+        } catch (error) {
+            console.error(`[JWT]: Ошибка обработки токена: ${error.message}`);
+            if (error.isBoom) {
+                return res.status(error.output.statusCode).json({ error: error.message });
+            }
+            res.status(500).json({ error: 'Ошибка обработки токена' });
+        }
+    }
+
+    async _handleCallback(req, res) {
         try {
             const { userId } = req.query;
             if(!userId) {
@@ -55,7 +84,7 @@ class AuthRouter {
         }
     }
 
-    async handleKeycloakTokens(req, res) {
+    async _handleKeycloakTokens(req, res) {
         try {
             const { userId } = req.body;
             if (!userId) {
@@ -66,7 +95,7 @@ class AuthRouter {
 
             const subLogin = await this.authController.findUserById({ userId });
 
-            this._setIp(req);
+            this._setIp({ req });
 
             const result = await this.authController.simpleLogin({ login: subLogin.login })
             res.send({
@@ -87,7 +116,7 @@ class AuthRouter {
         }
     }
 
-    async handleRegionUpdateAndLogin(req, res) {
+    async _handleRegionUpdateAndLogin(req, res) {
         try {
             const { userId, regionId } = req.body;
             if (!userId || !regionId) {
@@ -96,7 +125,7 @@ class AuthRouter {
             const user = await this.authController.updateUserRegion({ userId, regionId });
             const { accessToken, refreshToken } = this._getTokensFromCookies({ req, userId });
 
-            this._setIp(req);
+            this._setIp({ req });
 
             const result = await login({
                 login: user.email,
@@ -121,39 +150,16 @@ class AuthRouter {
         }
     }
 
-    async handleKeycloakLogin(req, res) {
+    async _handleKeycloakLogin(req, res) {
         try {
             const { kuser, access_token, refresh_token } = this._extractTokensFromRequest({ req });
-
-            const { existsUser, existsSubLogin } = await this.authController.findUserByEmail({
-                email: kuser.email,
-            });
-            if (!existsUser) {
-                const { user } = await this.authController.createUser({
-                    userInfo: kuser,
-                })
-                this._setTokensInCookies({
-                    res,
-                    userId: user._id,
-                    access_token,
-                    refresh_token
-                });
-
-                return res.redirect(
-                    `${this.authController.getRedirectUri()}/signin/bid?id=${user._id}&select-region=true`
-                );
-            }
-            this._setTokensInCookies({
+            const redirectUri = await this._processUserAndSetTokens({
                 res,
-                userId: existsSubLogin._id,
+                userInfo: kuser,
                 access_token,
-                refresh_token
+                refresh_token,
             });
-
-            return res.redirect(
-                `${this.authController.getRedirectUri()}/signin/bid?id=${existsSubLogin._id}&auth=true`
-            );
-
+            return res.redirect(redirectUri);
         } catch (error) {
             console.error(`[KEYCLOAK]: Ошибка при логине: ${error.message}`);
             if (error.isBoom) {
@@ -165,11 +171,50 @@ class AuthRouter {
         }
     }
 
-    getRouter() {
-        return this.router;
+    async _processUserAndSetTokens({res, userInfo, access_token, refresh_token }) {
+        const { email } = userInfo;
+        return this.authController.findUserByEmail({ email })
+            .then(async ({ existsUser, existsSubLogin }) => {
+                if (!existsUser) {
+                    const { user } = await this.authController.createUser({ userInfo });
+                    this._setTokensInCookies({
+                        res,
+                        userId: user._id,
+                        access_token,
+                        refresh_token,
+                    });
+
+                    return `${this.authController.getRedirectUri()}/signin/bid?id=${user._id}&select-region=true`;
+                }
+
+                this._setTokensInCookies({
+                    res,
+                    userId: existsSubLogin._id,
+                    access_token,
+                    refresh_token,
+                });
+
+                return `${this.authController.getRedirectUri()}/signin/bid?id=${existsSubLogin._id}&auth=true`;
+            });
     }
 
-    _setIp(req){
+    _extractEmailFormRequest({ req }) {
+        const authHeader = req.headers['authorization'];
+        if(!authHeader) {
+            throw badRequest('Заголовок Authorization отсутствует');
+        }
+        const token = authHeader.split(' ')[1];
+        if(!token) {
+            throw badRequest('Токен отсутствует в заголовке Authorization');
+        }
+        const payload = decode(token);
+        if (!payload) {
+            throw badRequest('Невозможно декодировать токен.');
+        }
+        return { ...payload, token };
+    }
+
+    _setIp({ req }){
         const ip = requestIp.getClientIp(req);
         req.body.ip = ip;
     }
