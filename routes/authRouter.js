@@ -177,11 +177,11 @@ class AuthRouter {
     _clearTokensFromCookies({ res, userId }) {
         res.clearCookie(`access_token_${userId}`, {
             httpOnly: true,
-            sameSite: 'None',
+            secure: false,
         });
         res.clearCookie(`refresh_token_${userId}`, {
             httpOnly: true,
-            sameSite: 'None',
+            secure: false,
         });
     }
 
@@ -204,11 +204,11 @@ class AuthRouter {
     _setTokensInCookies({ res, userId, access_token, refresh_token }) {
         res.cookie(`access_token_${userId}`, access_token, {
             httpOnly: true,
-            sameSite: 'None',
+            secure: false,
         });
         res.cookie(`refresh_token_${userId}`, refresh_token, {
             httpOnly: true,
-            sameSite: 'None',
+            secure: false,
         });
     }
 
