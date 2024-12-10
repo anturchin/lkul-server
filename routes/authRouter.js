@@ -32,7 +32,7 @@ class AuthRouter {
             this._handleRegionUpdateAndLogin.bind(this)
         );
 
-        this.router.post(
+        this.router.get(
             '/bid/login',
             this._handleBidLogin.bind(this)
         )
