@@ -2,7 +2,6 @@ const { badRequest } = require('boom');
 const express = require('express');
 const requestIp = require('request-ip');
 const { login } = require("../controllers/UserController");
-const { decode } = require("jsonwebtoken");
 
 class AuthRouter {
     constructor({ authController }) {
@@ -32,11 +31,6 @@ class AuthRouter {
             this._handleRegionUpdateAndLogin.bind(this)
         );
 
-        this.router.get(
-            '/bid/login',
-            this._handleBidLogin.bind(this)
-        )
-
         this.router.use(
             this.keycloak.middleware({ logout: '/keycloak/logout' })
         );
@@ -44,25 +38,6 @@ class AuthRouter {
 
     getRouter() {
         return this.router;
-    }
-
-    async _handleBidLogin(req, res) {
-        try {
-            const { token, ...kuser } = this._extractEmailFormRequest({ req });
-            const redirectUri = await this._processUserAndSetTokens({
-                res,
-                userInfo: kuser,
-                access_token: token,
-                refresh_token: token,
-            });
-            return res.send({ redirectUri });
-        } catch (error) {
-            console.error(`[JWT]: Ошибка обработки токена: ${error.message}`);
-            if (error.isBoom) {
-                return res.status(error.output.statusCode).json({ error: error.message });
-            }
-            res.status(500).json({ error: 'Ошибка обработки токена' });
-        }
     }
 
     async _handleCallback(req, res) {
@@ -196,22 +171,6 @@ class AuthRouter {
 
                 return `${this.authController.getRedirectUri()}/signin/bid?id=${existsSubLogin._id}&auth=true`;
             });
-    }
-
-    _extractEmailFormRequest({ req }) {
-        const authHeader = req.headers['authorization'];
-        if(!authHeader) {
-            throw badRequest('Заголовок Authorization отсутствует');
-        }
-        const token = authHeader.split(' ')[1];
-        if(!token) {
-            throw badRequest('Токен отсутствует в заголовке Authorization');
-        }
-        const payload = decode(token);
-        if (!payload) {
-            throw badRequest('Невозможно декодировать токен.');
-        }
-        return { ...payload, token };
     }
 
     _setIp({ req }){
