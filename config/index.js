@@ -1,5 +1,6 @@
 const dotenv = require("dotenv");
 const path = require("path");
+const readFileSafely = require("../libs/readFileSafely");
 
 const { PROFILE } = process.env;
 
@@ -63,6 +64,15 @@ switch (PROFILE) {
       path: path.resolve(__dirname, ".env/.default.env"),
     }).parsed;
 }
+
+const keycloakСerts = [
+  readFileSafely(path.resolve(config.KEYCLOAK_DEV_CERT)),
+  readFileSafely(path.resolve(config.KEYCLOAK_DEV_TEST)),
+  readFileSafely(path.resolve(config.KEYCLOAK_DEV_CA)),
+  readFileSafely(path.resolve(config.KEYCLOAK_DEV_ROOT)),
+];
+
+const keycloakConfig = readFileSafely(path.resolve(config.KEYCLOAK_CONFIG_PATH));
 
 module.exports = {
   port: config.PORT,
@@ -130,4 +140,9 @@ module.exports = {
   smorodina: {
     url: config.SMORODINA_URL,
   },
+  keycloakСerts,
+  sessionSecretLength: config.SESSION_SECRET_LENGTH,
+  redirectUri: config.REDIRECT_URI,
+  keycloakConfig: JSON.parse(keycloakConfig),
+  defaultUserPassword: config.DEFAULT_USER_PASSWORD,
 };

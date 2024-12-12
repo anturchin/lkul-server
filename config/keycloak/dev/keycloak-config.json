@@ -1,0 +1,11 @@
+{
+    "realm": "busid-id1-cradle-id-dev-external",
+    "auth-server-url": "https://bid-keycloak.luna-park.dev",
+    "ssl-required": "external",
+    "resource": "mrg-project-integration",
+    "credentials": {
+        "secret": "M7NadOodxjoISnjRON2bl0nx47TkOz6c"
+    },
+    "use-resource-role-mappings": true,
+    "confidential-port": 0
+}

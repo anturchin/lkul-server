@@ -3,6 +3,12 @@ const app = express();
 const config = require('./config');
 const port = config.port;
 
+// Keycloak
+const cookieParser = require('cookie-parser');
+const AuthController = require('./controllers/AuthController');
+const AuthRouter = require('./routes/authRouter');
+// ===========================================================================
+
 const {notFound} = require('boom');
 const mongooseValidationErrors = require('./libs/mongooseValidationErrors');
 
@@ -11,25 +17,41 @@ require('./scripts/defaultDBValues');
 require('./scripts/roles');
 require('./scripts/insertRolsForAllUsers');
 require('./scripts/createMrgOrg');
+
 app.use(express.urlencoded({extended:true, limit: '10mb'}));
 app.use(express.json({limit: '10mb'}));
+
+// Keycloak
+app.use(cookieParser());
+// =====================
 
 app.use(require('cors')({
     'origin': true,
     'methods': 'GET,POST,PUT,DELETE,OPTIONS',
-    'allowedHeaders': ['Content-Type', 'x-access-token', 'user-agent'],
-    'optionsSuccessStatus': 200
+    'allowedHeaders': ['Content-Type', 'x-access-token', 'user-agent', 'Authorization'],
+    'optionsSuccessStatus': 200,
+    'credentials': true,
 }) );
+
+// Keycloak
+const authController = new AuthController({ config });
+authController.setupMiddleware(app);
+const authRouter = new AuthRouter({
+    authController,
+});
+// ===========================================================
 
 app.use((req, _res, next) => {
     console.log(`${new Date()} ${req.ip}:${req.method} ${req.url}`);
     next();
 });
-
 app.use('/public', express.static('./public'));
 app.use('/media', express.static('./media'));
-
 app.use('/api', require('./routes'));
+
+// Keycloak
+app.use('/auth', authRouter.getRouter());
+// =====================================
 
 app.use((_req, _res, next) => {
     next(notFound('Not found'));
