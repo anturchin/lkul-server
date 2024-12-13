@@ -1,0 +1,13 @@
+{
+  "realm": "ecoportal",
+  "auth-server-url": "https://id.bid.gazprom-neft.ru/",
+  "ssl-required": "external",
+  "resource": "mrg-external-project-integration",
+  "verify-token-audience": false,
+  "credentials": {
+    "secret": "0SnFqSIo818oJKS0MfQYEYNYGEqlwY6g"
+  },
+  "use-resource-role-mappings": true,
+  "confidential-port": 0,
+  "policy-enforcer": {}
+}

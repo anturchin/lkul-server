@@ -1,7 +1,6 @@
 const { notFound, conflict, badRequest, unauthorized  } = require('boom');
 const { Types } = require("mongoose");
 const crypto = require('node:crypto');
-const https = require('node:https');
 const session = require('express-session');
 const Keycloak = require('keycloak-connect');
 const auth = require('vvdev-auth');
@@ -19,7 +18,11 @@ class AuthController {
     }
 
     initializeKeycloak() {
-        new https.Agent({ ca: this.config.keycloakСerts });
+        const { PROFILE } = process.env;
+        if(PROFILE === this.config.envTypes.LOCAL) {
+            const https = require('node:https');
+            new https.Agent({ ca: this.config.keycloakCerts });
+        }
         return new Keycloak(
             { store: this.memoryStore },
             this.config.keycloakConfig
