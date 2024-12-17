@@ -35,10 +35,7 @@ app.use(require('cors')({
 
 // Keycloak
 const authController = new AuthController({ config });
-authController.setupMiddleware(app);
-const authRouter = new AuthRouter({
-    authController,
-});
+const authRouter = new AuthRouter({ authController });
 // ===========================================================
 
 app.use((req, _res, next) => {
