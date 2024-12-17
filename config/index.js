@@ -158,4 +158,5 @@ module.exports = {
   keycloakConfig: JSON.parse(keycloakConfig),
   defaultUserPassword: config.DEFAULT_USER_PASSWORD,
   envTypes,
+  PROFILE,
 };

@@ -85,10 +85,12 @@ class AuthController {
             refresh_token: refreshToken,
         });
         this._clearTokensFromCookies({ res, userId });
-        const httpsAgent =  new https.Agent({ ca: this.config.keycloakCerts });
+        const httpsAgent = this.config.PROFILE === this.config.envTypes.LOCAL
+            ? new https.Agent({ ca: this.config.keycloakCerts })
+            : undefined;
         await axios.post(logoutUrl, params, {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            httpsAgent
+            ...(httpsAgent ? { httpsAgent } : {}),
         });
     }
 
@@ -275,10 +277,12 @@ class AuthController {
         params.append('code', code);
         params.append('redirect_uri', this.config.redirectUriBack);
         try {
-            const httpsAgent =  new https.Agent({ ca: this.config.keycloakCerts });
+            const httpsAgent = this.config.PROFILE === this.config.envTypes.LOCAL
+                ? new https.Agent({ ca: this.config.keycloakCerts })
+                : undefined;
             const { data } = await axios.post(tokenUrl, params, {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                httpsAgent,
+                ...(httpsAgent ? { httpsAgent } : {}),
             });
             return data;
         } catch (error) {
