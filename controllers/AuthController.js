@@ -248,10 +248,10 @@ class AuthController {
         return this._findUserByEmail({ email })
             .then(async ({ existsUser, existsSubLogin }) => {
                 if (!existsUser) {
-                    const { user } = await this._createUser({ userInfo });
+                    const { user, subLogin } = await this._createUser({ userInfo });
                     this._setTokensInCookies({
                         res,
-                        userId: user._id,
+                        userId: subLogin._id,
                         access_token,
                         refresh_token,
                     });
