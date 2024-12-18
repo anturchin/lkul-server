@@ -44,7 +44,7 @@ class AuthController {
         });
     }
 
-    async updateRegionAndLogin({req, userId, regionId }){
+    async updateRegionAndLogin({ req, userId, regionId }){
         const user = await this._updateUserRegion({ userId, regionId });
         const { accessToken, refreshToken } = this._getTokensFromCookies({ req, userId });
         this._setIp({ req });
@@ -62,8 +62,9 @@ class AuthController {
     }
 
     async getTokens({ req, userId }){
-        const { accessToken, refreshToken } = this._getTokensFromCookies({ req, userId });
         const subLogin = await this._findUserById({ userId });
+        const { existsUser } = await this._findUserByEmail({ email: subLogin.login });
+        const { accessToken, refreshToken } = this._getTokensFromCookies({ req, userId: existsUser._id });
         this._setIp({ req });
         const result = await this._simpleLogin({ login: subLogin.login })
         return {
@@ -246,12 +247,12 @@ class AuthController {
     async _processUserAndSetTokens({res, userInfo, access_token, refresh_token }) {
         const { email } = userInfo;
         return this._findUserByEmail({ email })
-            .then(async ({ existsUser, existsSubLogin }) => {
+            .then(async ({ existsUser }) => {
                 if (!existsUser) {
-                    const { user, subLogin } = await this._createUser({ userInfo });
+                    const { user } = await this._createUser({ userInfo });
                     this._setTokensInCookies({
                         res,
-                        userId: subLogin._id,
+                        userId: user._id,
                         access_token,
                         refresh_token,
                     });
@@ -259,11 +260,11 @@ class AuthController {
                 }
                 this._setTokensInCookies({
                     res,
-                    userId: existsSubLogin._id,
+                    userId: existsUser._id,
                     access_token,
                     refresh_token,
                 });
-                return `${this.config.redirectUriFront}/signin/bid?id=${existsSubLogin._id}&auth=true`;
+                return `${this.config.redirectUriFront}/signin/bid?id=${existsUser._id}&auth=true`;
             });
     }
 
