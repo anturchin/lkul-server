@@ -5,6 +5,7 @@ const readFileSafely = require("../libs/readFileSafely");
 const { PROFILE } = process.env;
 
 const envTypes = {
+  PREPROD: 'preprod',
   PROD: "prod",
   PROD_KZN: "prod-kzn",
   PROD_MSK: "prod-msk",
@@ -18,6 +19,11 @@ const envTypes = {
 let config = null;
 
 switch (PROFILE) {
+  case envTypes.PREPROD:
+    config = dotenv.config({
+      path: path.resolve(__dirname, ".env/.preprod.env"),
+    }).parsed;
+    break;
   case envTypes.PROD:
     config = dotenv.config({
       path: path.resolve(__dirname, ".env/.prod.env"),
@@ -147,8 +153,10 @@ module.exports = {
   },
   keycloakCerts: getKeycloakCerts(),
   sessionSecretLength: config.SESSION_SECRET_LENGTH,
-  redirectUri: config.REDIRECT_URI,
+  redirectUriBack: config.REDIRECT_URI_BACK,
+  redirectUriFront: config.REDIRECT_URI_FRONT,
   keycloakConfig: JSON.parse(keycloakConfig),
   defaultUserPassword: config.DEFAULT_USER_PASSWORD,
   envTypes,
+  PROFILE,
 };
