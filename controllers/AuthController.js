@@ -254,6 +254,17 @@ class AuthController {
                     });
                     return `${this.config.redirectUriFront}/signin/bid?id=${subLogin._id}&select-region=true`;
                 }
+
+                if (!existsUser.regionId) {
+                    this._setTokensInCookies({
+                        res,
+                        userId: existsSubLogin._id,
+                        access_token,
+                        refresh_token,
+                    });
+                    return `${this.config.redirectUriFront}/signin/bid?id=${existsSubLogin._id}&select-region=true`;
+                }
+
                 this._setTokensInCookies({
                     res,
                     userId: existsSubLogin._id,
