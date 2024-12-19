@@ -3,7 +3,7 @@ const { Types } = require("mongoose");
 const auth = require('vvdev-auth');
 const User = require("../models/User");
 const SubLogin = require("../models/SubLogin");
-const { createDefaultRoles, login} = require("./UserController");
+const { createDefaultRoles, login } = require("./UserController");
 const { Consumer } = require("../models");
 const { sign } = require("../libs/jwt");
 const https = require("node:https");
@@ -45,7 +45,8 @@ class AuthController {
     }
 
     async updateRegionAndLogin({ req, userId, regionId }){
-        const user = await this._updateUserRegion({ userId, regionId });
+        const subLogin = await this._findSubLoginById({ userId });
+        const user = await this._updateUserRegion({ email: subLogin.login, regionId });
         const { accessToken, refreshToken } = this._getTokensFromCookies({ req, userId });
         this._setIp({ req });
         const result = await login({
@@ -62,9 +63,8 @@ class AuthController {
     }
 
     async getTokens({ req, userId }){
-        const subLogin = await this._findUserById({ userId });
-        const { existsUser } = await this._findUserByEmail({ email: subLogin.login });
-        const { accessToken, refreshToken } = this._getTokensFromCookies({ req, userId: existsUser._id });
+        const subLogin = await this._findSubLoginById({ userId });
+        const { accessToken, refreshToken } = this._getTokensFromCookies({ req, userId: subLogin._id });
         this._setIp({ req });
         const result = await this._simpleLogin({ login: subLogin.login })
         return {
@@ -95,7 +95,7 @@ class AuthController {
         });
     }
 
-    async _findUserById({ userId }) {
+    async _findSubLoginById({ userId }) {
         const subLogin = await SubLogin.findById(userId);
         if (!subLogin) {
             throw notFound('Пользователь не найден');
@@ -103,9 +103,9 @@ class AuthController {
         return subLogin;
     }
 
-    async _updateUserRegion({ userId, regionId }) {
+    async _updateUserRegion({ email, regionId }) {
         const user = await User.findOneAndUpdate(
-            { _id: Types.ObjectId(userId) },
+            { email },
             { regionId: Types.ObjectId(regionId) },
             { new: true }
         );
@@ -225,10 +225,6 @@ class AuthController {
     }
 
     async _createUser({ userInfo }) {
-        const { existsUser } = await this._findUserByEmail({ email: userInfo.email });
-        if (existsUser) {
-            throw conflict('Пользователь с таким email уже существует');
-        }
         const hash = await this._generateHashPassword({
             password: this.config.defaultUserPassword,
         });
@@ -247,24 +243,24 @@ class AuthController {
     async _processUserAndSetTokens({res, userInfo, access_token, refresh_token }) {
         const { email } = userInfo;
         return this._findUserByEmail({ email })
-            .then(async ({ existsUser }) => {
+            .then(async ({ existsUser, existsSubLogin }) => {
                 if (!existsUser) {
-                    const { user } = await this._createUser({ userInfo });
+                    const { subLogin } = await this._createUser({ userInfo });
                     this._setTokensInCookies({
                         res,
-                        userId: user._id,
+                        userId: subLogin._id,
                         access_token,
                         refresh_token,
                     });
-                    return `${this.config.redirectUriFront}/signin/bid?id=${user._id}&select-region=true`;
+                    return `${this.config.redirectUriFront}/signin/bid?id=${subLogin._id}&select-region=true`;
                 }
                 this._setTokensInCookies({
                     res,
-                    userId: existsUser._id,
+                    userId: existsSubLogin._id,
                     access_token,
                     refresh_token,
                 });
-                return `${this.config.redirectUriFront}/signin/bid?id=${existsUser._id}&auth=true`;
+                return `${this.config.redirectUriFront}/signin/bid?id=${existsSubLogin._id}&auth=true`;
             });
     }
 
